@@ -66,29 +66,56 @@ const MapPlain = () => {
           <CustomParameter
             logo={<TbBorderStyle2 />}
             parameter={"Batas Administrasi"}
+            onClick={() => {
+              // logika pemanggilan data penutupan lahan
+              console.log("Batas Administrasi");
+            }}
           />
 
           <CustomParameter
             logo={<FaMountainSun />}
             parameter={"Penutupan Lahan"}
+            onClick={() => {
+              // logika pemanggilan data penutupan lahan
+              console.log("Penutupan Lahan");
+            }}
           />
 
           <CustomParameter
             logo={<TbHomeStats />}
             parameter={"Persil Bangunan"}
+            onClick={() => {
+              // logika pemanggilan data persil bangunan
+              console.log("Persil Bangunan");
+            }}
           />
 
           <CustomParameter
             logo={<TiWavesOutline />}
             parameter={"Ketinggian Rob"}
+            onClick={() => {
+              // logika pemanggilan data ketinggian rob
+              console.log("Ketinggian Rob");
+            }}
           />
 
           <CustomParameter
             logo={<FaDigitalOcean />}
             parameter={"Garis Pantai"}
+            onClick={() => {
+              // logika pemanggilan data garis pantai
+              console.log("Garis Pantai");
+            }}
           />
 
-          <CustomParameter logo={<GiRiver />} parameter={"Sungai"} />
+          <CustomParameter
+            logo={<GiRiver />}
+            parameter={"Sungai"}
+            onClick={() => {
+              // logika pemanggilan data sungai
+              console.log("sungai");
+            }}
+          />
         </div>
 
         <div className="mx-5 pt-20">

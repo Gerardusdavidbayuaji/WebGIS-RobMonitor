@@ -1,13 +1,14 @@
 interface ParameterProps {
   logo: any;
   parameter: string;
+  onClick?: () => void;
 }
 
 const CustomParameter = (props: ParameterProps) => {
-  const { logo, parameter } = props;
+  const { logo, parameter, onClick } = props;
 
   return (
-    <div className="flex items-center gap-2 w-full mb-4">
+    <div className="flex items-center gap-2 w-full mb-4" onClick={onClick}>
       <div className="p-2 bg-[#1265AE] text-white w-fit h-fit rounded-lg">
         {logo}
       </div>
