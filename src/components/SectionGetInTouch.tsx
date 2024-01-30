@@ -1,3 +1,7 @@
+import { useState } from "react";
+
+import { carouselImages } from "@/utils/apis/company/sampelData";
+
 import {
   Carousel,
   CarouselContent,
@@ -7,6 +11,12 @@ import {
 } from "@/components/ui/carousel";
 
 const SectionGetInTouch = () => {
+  const [, setCurrentImage] = useState(carouselImages[0].image);
+
+  const changeImage = (newImage: string) => {
+    setCurrentImage(newImage);
+  };
+
   return (
     <div>
       <section className="grid grid-cols-12 pt-6 text-gray-600 z-30">
@@ -27,12 +37,13 @@ const SectionGetInTouch = () => {
         <div className="col-start-2 col-span-10 mt-10">
           <Carousel>
             <CarouselContent>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <CarouselItem key={index}>
+              {carouselImages.map((item) => (
+                <CarouselItem key={item.id}>
                   <img
-                    src="/assets/image-1.jpg"
-                    alt="image-home"
+                    src={item.image}
+                    alt="carousel-image"
                     className="w-full h-80 object-cover"
+                    onClick={() => changeImage(item.image)}
                   />
                 </CarouselItem>
               ))}
