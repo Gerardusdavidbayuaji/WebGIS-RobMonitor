@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { carouselImages } from "@/utils/apis/company/sampelData";
+import { carouselImages } from "@/utils/apis/company/sampel-data";
 
 import {
   Carousel,
