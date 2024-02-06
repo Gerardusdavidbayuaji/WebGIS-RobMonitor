@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "Titik_Validasi",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "OBJECTID": 1, "Name": "KT5", "SymbolID": 2, "Longitude": 113.416498408, "Latitude": -7.737157029, "Tinggi Rob": "> 1,00 m" }, "geometry": { "type": "Point", "coordinates": [ 113.416498408374878, -7.737157028873753, 0.0 ] } },
+{ "type": "Feature", "properties": { "OBJECTID": 2, "Name": "KT9", "SymbolID": 2, "Longitude": 113.442515892, "Latitude": -7.733144848, "Tinggi Rob": "> 1,00 m" }, "geometry": { "type": "Point", "coordinates": [ 113.442515892294637, -7.733144848356005, 0.0 ] } },
+{ "type": "Feature", "properties": { "OBJECTID": 3, "Name": "KS8", "SymbolID": 1, "Longitude": 113.43062136099999, "Latitude": -7.743669576, "Tinggi Rob": "0.50-1.00" }, "geometry": { "type": "Point", "coordinates": [ 113.43062136088713, -7.743669575590388, 0.0 ] } },
+{ "type": "Feature", "properties": { "OBJECTID": 4, "Name": "KR10", "SymbolID": 0, "Longitude": 113.455793716, "Latitude": -7.726562165, "Tinggi Rob": "0-0.50 m" }, "geometry": { "type": "Point", "coordinates": [ 113.455793715907362, -7.726562165311634, 0.0 ] } }
+]
+}
