@@ -1,9 +1,9 @@
 export const carouselImages = [
-  { id: 1, image: "public/assets/image-1.jpg" },
-  { id: 2, image: "public/assets/image-2.jpg" },
-  { id: 3, image: "public/assets/image-3.jpg" },
-  { id: 4, image: "public/assets/image-4.jpg" },
-  { id: 5, image: "public/assets/image-5.jpg" },
+  { id: 1, image: "/assets/image-1.jpg" },
+  { id: 2, image: "/assets/image-2.jpg" },
+  { id: 3, image: "/assets/image-3.jpg" },
+  { id: 4, image: "/assets/image-4.jpg" },
+  { id: 5, image: "/assets/image-5.jpg" },
 ];
 
 export const listMap = [
