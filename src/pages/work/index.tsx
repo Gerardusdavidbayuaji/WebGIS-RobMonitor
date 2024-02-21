@@ -11,82 +11,43 @@ import { Button } from "@/components/ui/button";
 import { IoLayers } from "react-icons/io5";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenu,
 } from "@/components/ui/dropdown-menu";
 
-import { useEffect } from "react";
-import "ol/ol.css";
-import Map from "ol/Map";
-import View from "ol/View";
-import TileLayer from "ol/layer/Tile";
-import OSM from "ol/source/OSM";
 import CustomParameter from "@/components/CustomParameter";
 import SearchData from "@/components/Search";
-import { fromLonLat } from "ol/proj";
-import axios from "axios";
-import VectorSource from "ol/source/Vector";
-import VectorLayer from "ol/layer/Vector";
-import GeoJSON from "ol/format/GeoJSON";
-import Feature from "ol/Feature";
-import { Geometry } from "ol/geom";
-
-const getRobTinggi = async () => {
-  const apiUrlRobTinggi = "/sampel-data/Rob_Tinggi.geojson";
-
-  try {
-    const response = await axios.get(apiUrlRobTinggi);
-    console.log(response.data);
-    return response.data;
-  } catch (error) {
-    console.log("data:", error);
-  }
-};
+import TileLayer from "ol/layer/Tile";
+import { useEffect } from "react";
+import OSM from "ol/source/OSM";
+import View from "ol/View";
+import Map from "ol/Map";
+import "ol/ol.css";
 
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getRobTinggi();
+    const map = new Map({
+      target: "map",
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+      ],
+      view: new View({
+        center: [1359476780351.952, -774048.7917302734],
+        zoom: 7,
+      }),
+    });
 
-        // Create vector source
-        const vectorSource = new VectorSource({
-          features: new GeoJSON().readFeatures(data) as Feature<Geometry>[],
-        });
-
-        // Create vector layer
-        const vectorLayer = new VectorLayer({
-          source: vectorSource,
-        });
-
-        // Create map
-        new Map({
-          target: "map",
-          layers: [
-            new TileLayer({
-              source: new OSM(),
-            }),
-            vectorLayer,
-          ],
-          view: new View({
-            center: fromLonLat([111.372877, -0.996604]),
-            zoom: 5,
-          }),
-        });
-      } catch (error) {
-        console.log(error);
-      }
+    return () => {
+      map.dispose();
     };
-
-    fetchData();
-
-    return () => {};
   }, []);
 
   return (
