@@ -27,28 +27,66 @@ import TileLayer from "ol/layer/Tile";
 import OSM from "ol/source/OSM";
 import CustomParameter from "@/components/CustomParameter";
 import SearchData from "@/components/Search";
-import { transform } from "ol/proj";
+import { fromLonLat } from "ol/proj";
+import axios from "axios";
+import VectorSource from "ol/source/Vector";
+import VectorLayer from "ol/layer/Vector";
+import GeoJSON from "ol/format/GeoJSON";
+import Feature from "ol/Feature";
+import { Geometry } from "ol/geom";
+
+const getRobTinggi = async () => {
+  const apiUrlRobTinggi = "/sampel-data/Rob_Tinggi.geojson";
+
+  try {
+    const response = await axios.get(apiUrlRobTinggi);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log("data:", error);
+  }
+};
 
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
 
   useEffect(() => {
-    const map = new Map({
-      target: "map",
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: new View({
-        center: transform([111.372877, -0.996604], "EPSG:4326", "EPSG:3857"),
-        zoom: 5,
-      }),
-    });
+    const fetchData = async () => {
+      try {
+        const data = await getRobTinggi();
 
-    return () => {
-      map.dispose();
+        // Create vector source
+        const vectorSource = new VectorSource({
+          features: new GeoJSON().readFeatures(data) as Feature<Geometry>[],
+        });
+
+        // Create vector layer
+        const vectorLayer = new VectorLayer({
+          source: vectorSource,
+        });
+
+        // Create map
+        new Map({
+          target: "map",
+          layers: [
+            new TileLayer({
+              source: new OSM(),
+            }),
+            vectorLayer,
+          ],
+          view: new View({
+            center: fromLonLat([111.372877, -0.996604]),
+            zoom: 5,
+          }),
+        });
+      } catch (error) {
+        console.log(error);
+      }
     };
+
+    fetchData();
+
+    return () => {};
   }, []);
 
   return (
