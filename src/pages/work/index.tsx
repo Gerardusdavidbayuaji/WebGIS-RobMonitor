@@ -32,7 +32,6 @@ import { listMap } from "@/utils/apis/work/api";
 
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
-  // const [baseMap, setBaseMap] = useState(listMap[1]);
   const [baseMap, setBaseMap] = useState<any>(() => {
     const storeBaseMap = localStorage.getItem("selectedBaseMap");
     return storeBaseMap ? JSON.parse(storeBaseMap) : listMap[1];
