@@ -22,21 +22,26 @@ import {
 import CustomParameter from "@/components/CustomParameter";
 import SearchData from "@/components/Search";
 import TileLayer from "ol/layer/Tile";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import OSM from "ol/source/OSM";
 import View from "ol/View";
 import Map from "ol/Map";
 import "ol/ol.css";
 
+import { listMap } from "@/utils/apis/work/api";
+
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
+  const [baseMap, setBaseMap] = useState(listMap[1]);
 
   useEffect(() => {
     const map = new Map({
       target: "map",
       layers: [
         new TileLayer({
-          source: new OSM(),
+          source: new OSM({
+            url: baseMap.url,
+          }),
         }),
       ],
       view: new View({
@@ -48,7 +53,7 @@ const MapPlain = () => {
     return () => {
       map.dispose();
     };
-  }, []);
+  }, [baseMap]);
 
   return (
     <div>
@@ -142,15 +147,16 @@ const MapPlain = () => {
           <DropdownMenuContent className="mr-5 w-fit">
             <DropdownMenuLabel>Bisa Pilih Petamu</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Satellite</DropdownMenuItem>
-            <DropdownMenuItem>Street</DropdownMenuItem>
-            <DropdownMenuItem>Light</DropdownMenuItem>
-            <DropdownMenuItem>Dark</DropdownMenuItem>
+            {listMap.map((map) => (
+              <DropdownMenuItem key={map.id} onClick={() => setBaseMap(map)}>
+                {map.title}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
 
-      <div id="map" className="w-full h-screen z-0 absolute top-0" />
+      <div id="map" className="w-full h-screen z-0 absolute top-0"></div>
     </div>
   );
 };
