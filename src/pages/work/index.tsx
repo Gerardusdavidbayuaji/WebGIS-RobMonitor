@@ -1,15 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import { TbBorderStyle2, TbHomeStats } from "react-icons/tb";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { TiWavesOutline } from "react-icons/ti";
 import { FaDigitalOcean } from "react-icons/fa";
 import { FaMountainSun } from "react-icons/fa6";
-import { Separator } from "@/components/ui/separator";
 import { GiRiver } from "react-icons/gi";
-import { Button } from "@/components/ui/button";
 import { IoLayers } from "react-icons/io5";
 
+import CustomParameter from "@/components/CustomParameter";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import SearchData from "@/components/Search";
 import {
   DropdownMenuSeparator,
   DropdownMenuContent,
@@ -19,10 +22,7 @@ import {
   DropdownMenu,
 } from "@/components/ui/dropdown-menu";
 
-import CustomParameter from "@/components/CustomParameter";
-import SearchData from "@/components/Search";
 import TileLayer from "ol/layer/Tile";
-import { useEffect, useState } from "react";
 import OSM from "ol/source/OSM";
 import View from "ol/View";
 import Map from "ol/Map";
@@ -32,7 +32,15 @@ import { listMap } from "@/utils/apis/work/api";
 
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
-  const [baseMap, setBaseMap] = useState(listMap[1]);
+  // const [baseMap, setBaseMap] = useState(listMap[1]);
+  const [baseMap, setBaseMap] = useState<any>(() => {
+    const storeBaseMap = localStorage.getItem("selectedBaseMap");
+    return storeBaseMap ? JSON.parse(storeBaseMap) : listMap[1];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("selectedBaseMap", JSON.stringify(baseMap));
+  });
 
   useEffect(() => {
     const map = new Map({
