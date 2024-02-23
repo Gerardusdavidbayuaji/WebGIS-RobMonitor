@@ -29,8 +29,9 @@ export const getRobTinggi = async () => {
 
   try {
     const response = await axios.get(apiUrlRobTinggi);
-    console.log(response.data);
+    console.log("data rob", response.data);
   } catch (error: any) {
+    console.log("data rob error", error);
     throw Error(error.response.data);
   }
 };
