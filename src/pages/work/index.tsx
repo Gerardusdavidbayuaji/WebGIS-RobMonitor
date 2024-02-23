@@ -27,15 +27,21 @@ import OSM from "ol/source/OSM";
 import View from "ol/View";
 import Map from "ol/Map";
 import "ol/ol.css";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import GeoJSON from "ol/format/GeoJSON";
 
 import { listMap } from "@/utils/apis/work/api";
 
 const MapPlain = () => {
   const navigateToRobMonitor = useNavigate();
+  const coordinateKraksaan = [1359477419762.1914, -863863.7693089166];
   const [baseMap, setBaseMap] = useState<any>(() => {
     const storeBaseMap = localStorage.getItem("selectedBaseMap");
     return storeBaseMap ? JSON.parse(storeBaseMap) : listMap[1];
   });
+
+  let map: any = null;
 
   useEffect(() => {
     localStorage.setItem("selectedBaseMap", JSON.stringify(baseMap));
@@ -50,6 +56,9 @@ const MapPlain = () => {
             url: baseMap.url,
           }),
         }),
+        luasRobRendah,
+        luasRobSedang,
+        luasRobTinggi,
       ],
       view: new View({
         center: [1359476780351.952, -774048.7917302734],
@@ -57,14 +66,47 @@ const MapPlain = () => {
       }),
     });
 
+    // map.on("click", function (e) {
+    //   console.log(e);
+    // });
+
     return () => {
       map.dispose();
     };
   }, [baseMap]);
 
+  const luasRobRendah = new VectorLayer({
+    source: new VectorSource({
+      format: new GeoJSON(),
+      url: "src/utils/apis/work/sampel-data/Rob_Rendah.geojson",
+    }),
+  });
+
+  const luasRobSedang = new VectorLayer({
+    source: new VectorSource({
+      format: new GeoJSON(),
+      url: "src/utils/apis/work/sampel-data/Rob_Sedang.geojson",
+    }),
+  });
+
+  const luasRobTinggi = new VectorLayer({
+    source: new VectorSource({
+      format: new GeoJSON(),
+      url: "src/utils/apis/work/sampel-data/Rob_Tinggi.geojson",
+    }),
+  });
+
+  function zoomToKraksaan() {
+    map.getView().animate({
+      center: coordinateKraksaan,
+      duration: 2000,
+      zoom: 8,
+    });
+  }
+
   return (
     <div>
-      <div className="w-60 h-screen bg-[#FAFAF9] font-poppins z-20 absolute">
+      <div className="w-60 h-fit bg-[#FAFAF9] font-poppins m-2 z-20 rounded-md absolute">
         <h1 className="flex font-medium ml-5 py-5">Layers</h1>
 
         <Separator />
@@ -105,8 +147,7 @@ const MapPlain = () => {
             logo={<TiWavesOutline />}
             parameter={"Ketinggian Rob"}
             onClick={() => {
-              // logika pemanggilan data ketinggian rob
-              console.log("Ketinggian Rob");
+              zoomToKraksaan();
             }}
           />
 
@@ -129,7 +170,7 @@ const MapPlain = () => {
           />
         </div>
 
-        <div className="mx-5 pt-20">
+        <div className="mx-5 mb-3 pt-20">
           <Button
             className="bg-[#1265AE] hover:bg-[#1265ae7e] w-full"
             onClick={() => navigateToRobMonitor("/")}
@@ -144,7 +185,7 @@ const MapPlain = () => {
         </div>
       </div>
 
-      <div className="flex absolute top-0 right-0 m-5 z-40">
+      <div className="flex absolute top-0 right-0 m-2 z-40">
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="bg-[#1265AE] text-white p-2 w-fit h-fit rounded-lg">
