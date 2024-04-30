@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getGenanganRob, getBatasKecamatan, getGarisPantai, getPersilBangunan, getSungai, getTitikValidasi } from "../../utils/apis/work";
 
 import { useGeographic } from 'ol/proj';
 import { Geometry } from "ol/geom";
@@ -7,24 +7,44 @@ import { Feature } from "ol";
 
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
+import LayerGroup from "ol/layer/Group";
 import GeoJSON from 'ol/format/GeoJSON';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import View from 'ol/View';
-import Map from 'ol/Map';
+import * as ol from 'ol';
 import "ol/ol.css";
+import React from "react";
 
 const MapPlain = () => {
-  const [geojsonData, setGeojsonData] = useState(null);
-  const apiUrl = 'http://localhost:8080/geoserver/gsdb_simadu/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=gsdb_simadu%3Aprovinsi_jateng&outputFormat=application%2Fjson';
+  const [map, setMap] = useState<ol.Map | null>(null);
+  const [combinedGeojsonData, setCombinedGeojsonData] = useState<any>();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(apiUrl);
-        setGeojsonData(response.data);
-      } catch (error) {
-        console.log('upss, something when wrong', error);
+        const genanganRobData = await getGenanganRob();
+        const batasKecamatanData = await getBatasKecamatan();
+        const garisPantaiData = await getGarisPantai();
+        const persilBangunanData = await getPersilBangunan();
+        const sungaiData = await getSungai();
+        const titikValidasiData = await getTitikValidasi();
+
+        const combinedData = {
+          type: 'FeatureCollection',
+          features: [
+            ...genanganRobData.features,
+            ...batasKecamatanData.features,
+            ...garisPantaiData.features,
+            ...persilBangunanData.features,
+            ...sungaiData.features,
+            ...titikValidasiData.features
+          ]
+        };
+
+        setCombinedGeojsonData(combinedData);
+      } catch (error: any) {
+        console.log('Oops, something went wrong', error.message);
       }
     };
     
@@ -32,32 +52,52 @@ const MapPlain = () => {
   }, []);
   
   useEffect(() => {
-    if (geojsonData) {
-      console.log('data jateng', geojsonData);
+    if (combinedGeojsonData && map) {
       useGeographic();
+
       const vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(geojsonData) as Feature<Geometry>[],
+        features: new GeoJSON().readFeatures(combinedGeojsonData) as Feature<Geometry>[],
       });
       
       const vectorLayer = new VectorLayer({
         source: vectorSource,
       });
 
-      new Map({
-        target: 'map-container',
+      const layerGroup = new LayerGroup({
         layers: [
           new TileLayer({
             source: new OSM()
           }),
           vectorLayer,
         ],
-        view: new View({
-          center: [110, -7],
-          zoom: 8,
-        }),
       });
+
+      map.setLayerGroup(layerGroup);
+
+      map.setView(new View({
+        center: [113.429, -7.751],
+        zoom: 13,
+      }));
     }
-  }, [geojsonData]);
+  }, [combinedGeojsonData, map]);
+
+  useEffect(() => {
+    if (!map) {
+      const targetElement = document.getElementById('map-container');
+      if (targetElement) {
+        const newMap = new ol.Map({
+          target: targetElement,
+        });
+        setMap(newMap);
+      }
+    }
+
+    return () => {
+      if (map) {
+        map.setTarget();
+      }
+    };
+  }, [map]);
 
   return (
     <div id="map-container" className="w-full h-screen z-0 absolute top-0"></div>
@@ -65,3 +105,4 @@ const MapPlain = () => {
 };
 
 export default MapPlain;
+
