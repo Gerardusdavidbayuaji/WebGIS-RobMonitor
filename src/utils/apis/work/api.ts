@@ -5,6 +5,7 @@ export const getGenanganRob = async () => {
 
   try {
     const response = await axios.get(apiUrlGenanganRob);
+    console.log('tes genangan:', response);
     return response.data
   } catch (error: any) {
     console.log('Oops, somthing went wrong while fetching data', error);
