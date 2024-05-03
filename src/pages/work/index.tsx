@@ -1,18 +1,17 @@
-import React from "react";
-
 import { useEffect, useState } from "react";
 
-import { getGenanganRob, getBatasKecamatan, getGarisPantai, getPersilBangunan, getSungai, getTitikValidasi } from "../../utils/apis/work";
+import { getGenanganRob, getBatasKecamatan, getGarisPantai, getPersilBangunan, getSungai, getTitikValidasi } from "@/utils/apis/work";
+
+import { useGeographic } from 'ol/proj';
+import { Geometry } from "ol/geom";
+import { Feature } from "ol";
 
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { useGeographic } from 'ol/proj';
 import LayerGroup from "ol/layer/Group";
 import GeoJSON from 'ol/format/GeoJSON';
 import TileLayer from 'ol/layer/Tile';
-import { Geometry } from "ol/geom";
 import OSM from 'ol/source/OSM';
-import { Feature } from "ol";
 import View from 'ol/View';
 import * as ol from 'ol';
 import "ol/ol.css";
