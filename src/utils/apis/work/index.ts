@@ -1,3 +1,3 @@
-import { getGenanganRob, getBatasKecamatan, getGarisPantai, getPersilBangunan, getSungai, getTitikValidasi} from "./api";
+import {getGenanganRob} from "./api";
 
-export {getGenanganRob,  getBatasKecamatan, getGarisPantai, getPersilBangunan, getSungai, getTitikValidasi};
+export {getGenanganRob};

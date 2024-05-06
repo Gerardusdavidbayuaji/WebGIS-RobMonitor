@@ -5,7 +5,6 @@ export const getGenanganRob = async () => {
 
   try {
     const response = await axios.get(apiUrlGenanganRob);
-    console.log('tes genangan:', response);
     return response.data
   } catch (error: any) {
     console.log('Oops, somthing went wrong while fetching data', error);
@@ -13,65 +12,65 @@ export const getGenanganRob = async () => {
   }
 };
 
-export const getBatasKecamatan = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abatas_kecamatan&outputFormat=application%2Fjson';
+// export const getBatasKecamatan = async () => {
+//   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abatas_kecamatan&outputFormat=application%2Fjson';
+  
+//   try {
+//     const response = await axios.get(apiUrlGenanganRob);
+//     return response.data
+//   } catch (error: any) {
+//     console.log('Oops, somthing went wrong while fetching data', error);
+//     throw Error(error.response.data);
+//   }
+// };
 
-  try {
-    const response = await axios.get(apiUrlGenanganRob);
-    return response.data
-  } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
-    throw Error(error.response.data);
-  }
-};
+// export const getGarisPantai = async () => {
+//   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agaris_pantai&outputFormat=application%2Fjson';
 
-export const getGarisPantai = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agaris_pantai&outputFormat=application%2Fjson';
+//   try {
+//     const response = await axios.get(apiUrlGenanganRob);
+//     return response.data
+//   } catch (error: any) {
+//     console.log('Oops, somthing went wrong while fetching data', error);
+//     throw Error(error.response.data);
+//   }
+// };
 
-  try {
-    const response = await axios.get(apiUrlGenanganRob);
-    return response.data
-  } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
-    throw Error(error.response.data);
-  }
-};
+// export const getPersilBangunan = async () => {
+//   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Apersil_bangunan&outputFormat=application%2Fjson';
 
-export const getPersilBangunan = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Apersil_bangunan&outputFormat=application%2Fjson';
+//   try {
+//     const response = await axios.get(apiUrlGenanganRob);
+//     return response.data
+//   } catch (error: any) {
+//     console.log('Oops, somthing went wrong while fetching data', error);
+//     throw Error(error.response.data);
+//   }
+// };
 
-  try {
-    const response = await axios.get(apiUrlGenanganRob);
-    return response.data
-  } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
-    throw Error(error.response.data);
-  }
-};
+// export const getSungai = async () => {
+//   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Asungai&outputFormat=application%2Fjson';
 
-export const getSungai = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Asungai&outputFormat=application%2Fjson';
+//   try {
+//     const response = await axios.get(apiUrlGenanganRob);
+//     return response.data
+//   } catch (error: any) {
+//     console.log('Oops, somthing went wrong while fetching data', error);
+//     throw Error(error.response.data);
+//   }
+// };
 
-  try {
-    const response = await axios.get(apiUrlGenanganRob);
-    return response.data
-  } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
-    throw Error(error.response.data);
-  }
-};
+// export const getTitikValidasi = async () => {
+//   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Atitik_validasi&outputFormat=application%2Fjson';
 
-export const getTitikValidasi = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Atitik_validasi&outputFormat=application%2Fjson';
-
-  try {
-    const response = await axios.get(apiUrlGenanganRob);
-    return response.data
-  } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
-    throw Error(error.response.data);
-  }
-};
+//   try {
+//     const response = await axios.get(apiUrlGenanganRob);
+//     return response.data
+//   } catch (error: any) {
+//     console.log('Oops, somthing went wrong while fetching data', error);
+//     throw Error(error.response.data);
+//   }
+// };
 
 // import { ListMap } from "./types";
 
