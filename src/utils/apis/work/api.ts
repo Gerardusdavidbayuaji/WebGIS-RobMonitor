@@ -1,20 +1,21 @@
 import axios from "axios";
 
 export const getGenanganRob = async () => {
-  const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agenangan_rob_jatim&outputFormat=application%2Fjson';
+  const apiUrlGenanganRob =
+    "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agenangan_rob_jatim&outputFormat=application%2Fjson";
 
   try {
     const response = await axios.get(apiUrlGenanganRob);
-    return response.data
+    return response.data;
   } catch (error: any) {
-    console.log('Oops, somthing went wrong while fetching data', error);
+    console.log("Oops, somthing went wrong while fetching data", error);
     throw Error(error.response.data);
   }
 };
 
 // export const getBatasKecamatan = async () => {
 //   const apiUrlGenanganRob = 'http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abatas_kecamatan&outputFormat=application%2Fjson';
-  
+
 //   try {
 //     const response = await axios.get(apiUrlGenanganRob);
 //     return response.data
