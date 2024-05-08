@@ -9,10 +9,10 @@ const MapPlain = () => {
     null
   );
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-  const [showWMSLayer, setShowWMSLayer] = useState(false);
-  const [showHighDanger, setShowHighDanger] = useState(true);
-  const [showMediumDanger, setShowMediumDanger] = useState(true);
-  const [showLowDanger, setShowLowDanger] = useState(true);
+  const [showWMSLayer, setShowWMSLayer] = useState(true);
+  const [showHighDanger, setShowHighDanger] = useState(false);
+  const [showMediumDanger, setShowMediumDanger] = useState(false);
+  const [showLowDanger, setShowLowDanger] = useState(false);
 
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
@@ -45,26 +45,29 @@ const MapPlain = () => {
         const geoJsonData = response.data;
 
         let filteredGeoJsonData = geoJsonData.features.filter(
-          (feature: { properties: { layer: any } }) => {
-            const dangerLevel = feature.properties.layer;
+          (feature: { properties: { layer: string } }) => {
             if (selectedDanger === "All") return true;
             if (selectedDanger === "Bahaya Rob Rendah")
-              return showLowDanger && dangerLevel === "Bahaya Rob Rendah";
+              return (
+                showLowDanger &&
+                feature.properties.layer === "Bahaya Rob Rendah"
+              );
             if (selectedDanger === "Bahaya Rob Sedang")
-              return showMediumDanger && dangerLevel === "Bahaya Rob Sedang";
+              return (
+                showMediumDanger &&
+                feature.properties.layer === "Bahaya Rob Sedang"
+              );
             if (selectedDanger === "Bahaya Rob Tinggi")
-              return showHighDanger && dangerLevel === "Bahaya Rob Tinggi";
+              return (
+                showHighDanger &&
+                feature.properties.layer === "Bahaya Rob Tinggi"
+              );
             return false;
           }
         );
 
         if (dangerLayer) {
           dangerLayer.removeFrom(mapInstance);
-        }
-
-        if (filteredGeoJsonData.length === 0) {
-          console.log("No data found for the selected danger level.");
-          return;
         }
 
         const newDangerLayer = L.geoJson(filteredGeoJsonData, {
