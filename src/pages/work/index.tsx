@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "axios";
@@ -9,16 +9,16 @@ const MapPlain = () => {
     null
   );
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [showWMSLayer, setShowWMSLayer] = useState(false);
 
-  // add basemap
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
     const baseMap = L.tileLayer(
-      "https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=AW8IuG306IIk8kNdxEw6",
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
         maxZoom: 19,
         attribution:
-          '© <a href="https://www.maptiler.com/copyright/">MapTiler</a>, © OpenStreetMap contributors',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }
     );
 
@@ -30,7 +30,6 @@ const MapPlain = () => {
     };
   }, []);
 
-  // fetch danger data
   useEffect(() => {
     const getDataGenangan = async () => {
       if (!mapInstance) return;
@@ -42,7 +41,6 @@ const MapPlain = () => {
         const response = await axios.get(urlGenangan);
         const geoJsonData = response.data;
 
-        // Filter GeoJSON data based on selected danger
         let filteredGeoJsonData = geoJsonData.features;
         if (selectedDanger !== "All") {
           filteredGeoJsonData = geoJsonData.features.filter(
@@ -51,12 +49,10 @@ const MapPlain = () => {
           );
         }
 
-        // Remove previous danger layer if exists
         if (dangerLayer) {
           dangerLayer.removeFrom(mapInstance);
         }
 
-        // Create new danger layer and add to map
         const newDangerLayer = L.geoJson(filteredGeoJsonData, {
           style: {
             color:
@@ -71,14 +67,16 @@ const MapPlain = () => {
             weight: 0.3,
             opacity: 1,
           },
-          onEachFeature: function (f, l) {
-            l.bindPopup(
-              "luas: " + f.properties.Luas_m2 + " status:" + f.properties.layer
+          onEachFeature: function (feature, layer) {
+            layer.bindPopup(
+              "luas: " +
+                feature.properties.Luas_m2 +
+                " status:" +
+                feature.properties.layer
             );
           },
         }).addTo(mapInstance);
 
-        // Set new danger layer to state
         setDangerLayer(newDangerLayer);
 
         mapInstance.fitBounds(newDangerLayer.getBounds());
@@ -90,16 +88,88 @@ const MapPlain = () => {
     getDataGenangan();
   }, [selectedDanger, mapInstance]);
 
-  const handleDangerChange = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
+  useEffect(() => {
+    const getWmsData = async () => {
+      if (!mapInstance) return;
+
+      const urlBahayaRob = "http://localhost:8080/geoserver/rob_jatim/wms";
+
+      try {
+        const wmsLayer = L.tileLayer.wms(urlBahayaRob, {
+          layers: "rob_jatim:bahaya_rob_jatim",
+          format: "image/png",
+          transparent: true,
+        });
+
+        if (showWMSLayer) {
+          wmsLayer.addTo(mapInstance);
+        } else {
+          mapInstance.removeLayer(wmsLayer);
+        }
+
+        mapInstance.on("click", async (e) => {
+          if (!showWMSLayer) return;
+
+          const urlGetBahayaRob = `${urlBahayaRob}?&styles=
+          &service=WMS
+          &version=1.1.0
+          &srs=EPSG%3A4326
+          &request=GetFeatureInfo
+          &info_format=application/json
+          &layers=rob_jatim%3Abahaya_rob_jatim
+          &query_layers=rob_jatim%3Abahaya_rob_jatim
+          &width=${mapInstance.getSize().x}
+          &height=${mapInstance.getSize().y}
+          &bbox=${mapInstance.getBounds().toBBoxString()}
+          &x=${mapInstance.latLngToContainerPoint(e.latlng).x}
+          &y=${mapInstance.latLngToContainerPoint(e.latlng).y}`;
+
+          try {
+            const response = await axios.get(urlGetBahayaRob);
+            const geoJsonBahayaRob = response.data;
+            const bahayaRobValue =
+              geoJsonBahayaRob.features[0].properties.GRAY_INDEX;
+
+            L.popup()
+              .setLatLng(e.latlng)
+              .setContent("Index: " + bahayaRobValue + " pixel")
+              .openOn(mapInstance);
+          } catch (error) {
+            console.log(
+              "Oops, something went wrong while fetching WMS data",
+              error
+            );
+          }
+        });
+      } catch (error) {
+        console.log(
+          "Oops, something went wrong while fetching WMS data",
+          error
+        );
+      }
+    };
+
+    getWmsData();
+
+    return () => {
+      if (mapInstance) {
+        mapInstance.off("click");
+      }
+    };
+  }, [mapInstance, showWMSLayer]);
+
+  const handleDangerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDanger(e.target.value);
+  };
+
+  const handleWMSLayerToggle = () => {
+    setShowWMSLayer(!showWMSLayer);
   };
 
   return (
     <section>
       <div className="flex flex-col bg-[#FAFAF9] w-60 h-40 font-poppins z-20 absolute rounded-md m-2">
-        <div className=" m-2">
+        <div className="m-2">
           <div className="mb-1">
             <h2>WFS</h2>
             <hr />
@@ -113,7 +183,13 @@ const MapPlain = () => {
           <div>
             <h2>WMS</h2>
             <hr />
-            {/* tambahkan pilihan WMS di sini jika diperlukan */}
+            <input
+              type="checkbox"
+              id="toggleWMSLayer"
+              checked={showWMSLayer}
+              onChange={handleWMSLayerToggle}
+            />
+            <label htmlFor="toggleWMSLayer">Index Bahaya Rob</label>
           </div>
         </div>
       </div>
