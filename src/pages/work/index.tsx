@@ -4,12 +4,15 @@ import L from "leaflet";
 import axios from "axios";
 
 const MapPlain = () => {
-  const [selectedDanger, setSelectedDanger] = useState("Bahaya Rob Rendah");
+  const [selectedDanger] = useState("Bahaya Rob Rendah");
   const [dangerLayer, setDangerLayer] = useState<L.LayerGroup<any> | null>(
     null
   );
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
   const [showWMSLayer, setShowWMSLayer] = useState(false);
+  const [showHighDanger, setShowHighDanger] = useState(true);
+  const [showMediumDanger, setShowMediumDanger] = useState(true);
+  const [showLowDanger, setShowLowDanger] = useState(true);
 
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
@@ -41,16 +44,27 @@ const MapPlain = () => {
         const response = await axios.get(urlGenangan);
         const geoJsonData = response.data;
 
-        let filteredGeoJsonData = geoJsonData.features;
-        if (selectedDanger !== "All") {
-          filteredGeoJsonData = geoJsonData.features.filter(
-            (feature: { properties: { layer: string } }) =>
-              feature.properties.layer === selectedDanger
-          );
-        }
+        let filteredGeoJsonData = geoJsonData.features.filter(
+          (feature: { properties: { layer: any } }) => {
+            const dangerLevel = feature.properties.layer;
+            if (selectedDanger === "All") return true;
+            if (selectedDanger === "Bahaya Rob Rendah")
+              return showLowDanger && dangerLevel === "Bahaya Rob Rendah";
+            if (selectedDanger === "Bahaya Rob Sedang")
+              return showMediumDanger && dangerLevel === "Bahaya Rob Sedang";
+            if (selectedDanger === "Bahaya Rob Tinggi")
+              return showHighDanger && dangerLevel === "Bahaya Rob Tinggi";
+            return false;
+          }
+        );
 
         if (dangerLayer) {
           dangerLayer.removeFrom(mapInstance);
+        }
+
+        if (filteredGeoJsonData.length === 0) {
+          console.log("No data found for the selected danger level.");
+          return;
         }
 
         const newDangerLayer = L.geoJson(filteredGeoJsonData, {
@@ -86,7 +100,13 @@ const MapPlain = () => {
     };
 
     getDataGenangan();
-  }, [selectedDanger, mapInstance]);
+  }, [
+    selectedDanger,
+    mapInstance,
+    showHighDanger,
+    showMediumDanger,
+    showLowDanger,
+  ]);
 
   useEffect(() => {
     const getWmsData = async () => {
@@ -95,52 +115,54 @@ const MapPlain = () => {
       const urlBahayaRob = "http://localhost:8080/geoserver/rob_jatim/wms";
 
       try {
-        const wmsLayer = L.tileLayer.wms(urlBahayaRob, {
-          layers: "rob_jatim:bahaya_rob_jatim",
-          format: "image/png",
-          transparent: true,
-        });
-
         if (showWMSLayer) {
+          const wmsLayer = L.tileLayer.wms(urlBahayaRob, {
+            layers: "rob_jatim:bahaya_rob_jatim",
+            format: "image/png",
+            transparent: true,
+          });
           wmsLayer.addTo(mapInstance);
+
+          mapInstance.on("click", async (e) => {
+            const urlGetBahayaRob = `${urlBahayaRob}?&styles=
+            &service=WMS
+            &version=1.1.0
+            &srs=EPSG%3A4326
+            &request=GetFeatureInfo
+            &info_format=application/json
+            &layers=rob_jatim%3Abahaya_rob_jatim
+            &query_layers=rob_jatim%3Abahaya_rob_jatim
+            &width=${mapInstance.getSize().x}
+            &height=${mapInstance.getSize().y}
+            &bbox=${mapInstance.getBounds().toBBoxString()}
+            &x=${mapInstance.latLngToContainerPoint(e.latlng).x}
+            &y=${mapInstance.latLngToContainerPoint(e.latlng).y}`;
+
+            try {
+              const response = await axios.get(urlGetBahayaRob);
+              const geoJsonBahayaRob = response.data;
+              const bahayaRobValue =
+                geoJsonBahayaRob.features[0].properties.GRAY_INDEX;
+
+              L.popup()
+                .setLatLng(e.latlng)
+                .setContent("Index: " + bahayaRobValue + " pixel")
+                .openOn(mapInstance);
+            } catch (error) {
+              console.log(
+                "Oops, something went wrong while fetching WMS data",
+                error
+              );
+            }
+          });
         } else {
-          mapInstance.removeLayer(wmsLayer);
+          // Remove WMS layer if showWMSLayer is false
+          mapInstance.eachLayer((layer) => {
+            if (layer instanceof L.TileLayer.WMS) {
+              mapInstance.removeLayer(layer);
+            }
+          });
         }
-
-        mapInstance.on("click", async (e) => {
-          if (!showWMSLayer) return;
-
-          const urlGetBahayaRob = `${urlBahayaRob}?&styles=
-          &service=WMS
-          &version=1.1.0
-          &srs=EPSG%3A4326
-          &request=GetFeatureInfo
-          &info_format=application/json
-          &layers=rob_jatim%3Abahaya_rob_jatim
-          &query_layers=rob_jatim%3Abahaya_rob_jatim
-          &width=${mapInstance.getSize().x}
-          &height=${mapInstance.getSize().y}
-          &bbox=${mapInstance.getBounds().toBBoxString()}
-          &x=${mapInstance.latLngToContainerPoint(e.latlng).x}
-          &y=${mapInstance.latLngToContainerPoint(e.latlng).y}`;
-
-          try {
-            const response = await axios.get(urlGetBahayaRob);
-            const geoJsonBahayaRob = response.data;
-            const bahayaRobValue =
-              geoJsonBahayaRob.features[0].properties.GRAY_INDEX;
-
-            L.popup()
-              .setLatLng(e.latlng)
-              .setContent("Index: " + bahayaRobValue + " pixel")
-              .openOn(mapInstance);
-          } catch (error) {
-            console.log(
-              "Oops, something went wrong while fetching WMS data",
-              error
-            );
-          }
-        });
       } catch (error) {
         console.log(
           "Oops, something went wrong while fetching WMS data",
@@ -158,30 +180,55 @@ const MapPlain = () => {
     };
   }, [mapInstance, showWMSLayer]);
 
-  const handleDangerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedDanger(e.target.value);
-  };
-
   const handleWMSLayerToggle = () => {
     setShowWMSLayer(!showWMSLayer);
   };
 
+  const handleHighDangerToggle = () => {
+    setShowHighDanger(!showHighDanger);
+  };
+
+  const handleMediumDangerToggle = () => {
+    setShowMediumDanger(!showMediumDanger);
+  };
+
+  const handleLowDangerToggle = () => {
+    setShowLowDanger(!showLowDanger);
+  };
+
   return (
     <section>
-      <div className="flex flex-col bg-[#FAFAF9] w-60 h-40 font-poppins z-20 absolute rounded-md m-2">
+      <div className="flex flex-col bg-[#FAFAF9] w-60 h-44 font-poppins z-20 absolute rounded-md m-2">
         <div className="m-2">
-          <div className="mb-1">
-            <h2>WFS</h2>
-            <hr />
-            <select value={selectedDanger} onChange={handleDangerChange}>
-              <option value="All">Bahaya Rob</option>
-              <option value="Bahaya Rob Rendah">Bahaya Rob Rendah</option>
-              <option value="Bahaya Rob Sedang">Bahaya Rob Sedang</option>
-              <option value="Bahaya Rob Tinggi">Bahaya Rob Tinggi</option>
-            </select>
-          </div>
           <div>
-            <h2>WMS</h2>
+            <h2>WFS: Bahaya Rob</h2>
+            <hr />
+            <input
+              type="checkbox"
+              id="toggleHighDanger"
+              checked={showHighDanger}
+              onChange={handleHighDangerToggle}
+            />
+            <label htmlFor="toggleHighDanger">Bahaya Rob Tinggi</label>
+            <br />
+            <input
+              type="checkbox"
+              id="toggleMediumDanger"
+              checked={showMediumDanger}
+              onChange={handleMediumDangerToggle}
+            />
+            <label htmlFor="toggleMediumDanger">Bahaya Rob Sedang</label>
+            <br />
+            <input
+              type="checkbox"
+              id="toggleLowDanger"
+              checked={showLowDanger}
+              onChange={handleLowDangerToggle}
+            />
+            <label htmlFor="toggleLowDanger">Bahaya Rob Rendah</label>
+          </div>
+          <div className="mt-2">
+            <h2>WMS : Index Bahaya Rob</h2>
             <hr />
             <input
               type="checkbox"
@@ -189,7 +236,7 @@ const MapPlain = () => {
               checked={showWMSLayer}
               onChange={handleWMSLayerToggle}
             />
-            <label htmlFor="toggleWMSLayer">Index Bahaya Rob</label>
+            <label htmlFor="toggleWMSLayer">Index</label>
           </div>
         </div>
       </div>
