@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 
 const HomeTideInsight = () => {
   return (
-    <div>
+    <div className="bg-[#292929] w-full h-screen">
       <Navbar />
       <SectionGetInTouch />
       <Footer />

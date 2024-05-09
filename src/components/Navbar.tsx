@@ -1,34 +1,22 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { HiOutlineGlobe } from "react-icons/hi";
 
 const Navbar = () => {
-  const mapRef = useRef<any>(null);
-  const coordinateKraksaan = [1359477416282.8428, -863822.8494639626];
-
-  function zoomToKraksaan() {
-    if (mapRef.current) {
-      mapRef.current.getView().animate({
-        center: coordinateKraksaan,
-        duration: 3000,
-        zoom: 14,
-      });
-    }
-  }
 
   return (
-    <nav className="bg-gray-600 text-white sticky top-0 z-50 flex items-center justify-between w-full px-6 py-3 bg-opacity-80 backdrop-blur h-[60px]">
-      <p className="font-bold">
-        Rob<span className="font-extralight">Monitor</span>
-      </p>
+    <nav className="bg-white text-black sticky top-0 z-50 flex items-center justify-between w-full px-6 py-3">
+      <div className="flex items-center">
+        <span><HiOutlineGlobe /></span>
+        <div className="font-poppins text-2xl font-semibold">maprob</div>
+      </div>
 
-      <Link
-        to="/work"
-        onClick={() => {
-          zoomToKraksaan;
-        }}
-      >
-        <p className="font-extralight unThin">RobDashboard</p>
-      </Link>
+      <div className="flex items-center gap-5 text-black cursor-pointer">
+        <p className="text-sm font-medium">Studio</p>
+        <p className="text-sm font-medium mr-5">Insights</p>
+        <div className="flex items-center gap-2 text-black cursor-pointer">
+        <p className="text-sm font-medium">Log In</p>
+        <button className="rounded-full text-white bg-[#007afc] hover:bg-[#57a8ff] text-sm font-medium w-20 h-8">Sign Up</button>
+        </div>
+      </div>
     </nav>
   );
 };
