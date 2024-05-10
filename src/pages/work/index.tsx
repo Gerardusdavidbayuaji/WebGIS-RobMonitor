@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import { Separator } from "@/components/ui/separator"
-import CustomParameter from "@/components/CustomParameter";
-import { TbBorderStyle2, TbHomeStats } from "react-icons/tb";
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { TiWavesOutline } from "react-icons/ti";
-import { FaDigitalOcean } from "react-icons/fa";
-import { Button } from "@/components/ui/button";
 
-const tesMapPlain = () => {
-  const [, setMapInstance] = useState<L.Map | null>(null);
+import "leaflet/dist/leaflet.css";
+import axios from "axios";
+import L from "leaflet";
+
+const MapPlain = () => {
+  const [selectedDanger] = useState([
+    "Bahaya Rob Tinggi",
+    "Bahaya Rob Sedang",
+    "Bahaya Rob Rendah",
+  ]);
+  const [dangerLayer, setDangerLayer] = useState<L.LayerGroup<any> | null>(
+    null
+  );
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [showMediumDanger, setShowMediumDanger] = useState(true);
+  const [showHighDanger, setShowHighDanger] = useState(true);
+  const [showLowDanger, setShowLowDanger] = useState(true);
+  const [showWMSLayer, setShowWMSLayer] = useState(false);
 
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
@@ -31,67 +38,245 @@ const tesMapPlain = () => {
     };
   }, []);
 
+  // useEffect untuk mendapatkan data GeoJSON dari WFS
+  useEffect(() => {
+    const getDataGenangan = async () => {
+      if (!mapInstance) return;
+
+      const urlGenangan =
+        "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agenangan_rob_jatim&outputFormat=application%2Fjson";
+
+      try {
+        const response = await axios.get(urlGenangan);
+        const geoJsonData = response.data;
+
+        // Inisialisasi array untuk menyimpan data yang akan ditampilkan pada peta
+        const filteredFeatures = [];
+
+        // Iterasi melalui setiap fitur dalam GeoJSON
+        for (let i = 0; i < geoJsonData.features.length; i++) {
+          const feature = geoJsonData.features[i];
+
+          // Periksa apakah fitur sesuai dengan kriteria yang dipilih oleh pengguna
+          for (let j = 0; j < selectedDanger.length; j++) {
+            const dangerLevel = selectedDanger[j];
+            if (
+              dangerLevel === "All" ||
+              (dangerLevel === "Bahaya Rob Rendah" &&
+                showLowDanger &&
+                feature.properties.layer === "Bahaya Rob Rendah") ||
+              (dangerLevel === "Bahaya Rob Sedang" &&
+                showMediumDanger &&
+                feature.properties.layer === "Bahaya Rob Sedang") ||
+              (dangerLevel === "Bahaya Rob Tinggi" &&
+                showHighDanger &&
+                feature.properties.layer === "Bahaya Rob Tinggi")
+            ) {
+              // Tambahkan fitur ke dalam array hasil filter
+              filteredFeatures.push(feature);
+              // Keluar dari loop saat satu bahaya cocok
+              break;
+            }
+          }
+        }
+
+        // Hapus layer bahaya yang sudah ada jika ada
+        if (dangerLayer) {
+          dangerLayer.removeFrom(mapInstance);
+        }
+
+        // Buat layer baru dari data yang telah difilter
+        // Buat layer baru dari data yang telah difilter
+        const newDangerLayer = L.geoJson(filteredFeatures, {
+          style: (feature) => {
+            // Memastikan bahwa feature tidak undefined sebelum mengakses propertinya
+            if (!feature || !feature.properties || !feature.properties.layer) {
+              return {}; // Atau style default lainnya jika diperlukan
+            }
+            // Menggunakan warna berbeda berdasarkan tingkat bahaya
+            let color;
+            switch (feature.properties.layer) {
+              case "Bahaya Rob Rendah":
+                color = "green";
+                break;
+              case "Bahaya Rob Sedang":
+                color = "yellow";
+                break;
+              case "Bahaya Rob Tinggi":
+                color = "red";
+                break;
+              default:
+                color = "blue";
+            }
+            return {
+              color: color,
+              fillOpacity: 0.5,
+              weight: 0.3,
+              opacity: 1,
+            };
+          },
+          onEachFeature: function (feature, layer) {
+            if (feature && feature.properties && feature.properties.layer) {
+              layer.bindPopup(
+                "luas: " +
+                  feature.properties.Luas_m2 +
+                  " status:" +
+                  feature.properties.layer
+              );
+            }
+          },
+        }).addTo(mapInstance);
+
+        // Perbarui state untuk menyimpan layer bahaya yang baru
+        setDangerLayer(newDangerLayer);
+
+        // Perbesar peta agar sesuai dengan batas layer bahaya yang baru
+        mapInstance.fitBounds(newDangerLayer.getBounds());
+      } catch (error) {
+        console.log("Oops, something went wrong while fetching data", error);
+      }
+    };
+
+    // Panggil fungsi untuk mendapatkan data GeoJSON ketika ada perubahan pada dependencies
+    getDataGenangan();
+  }, [
+    selectedDanger,
+    mapInstance,
+    showHighDanger,
+    showMediumDanger,
+    showLowDanger,
+  ]);
+
+  useEffect(() => {
+    const getWmsData = async () => {
+      if (!mapInstance) return;
+
+      const urlBahayaRob = "http://localhost:8080/geoserver/rob_jatim/wms";
+
+      try {
+        if (showWMSLayer) {
+          const wmsLayer = L.tileLayer.wms(urlBahayaRob, {
+            layers: "rob_jatim:bahaya_rob_jatim",
+            format: "image/png",
+            transparent: true,
+          });
+          wmsLayer.addTo(mapInstance);
+
+          mapInstance.on("click", async (e) => {
+            const urlGetBahayaRob = `${urlBahayaRob}?&styles=
+            &service=WMS
+            &version=1.1.0
+            &srs=EPSG%3A4326
+            &request=GetFeatureInfo
+            &info_format=application/json
+            &layers=rob_jatim%3Abahaya_rob_jatim
+            &query_layers=rob_jatim%3Abahaya_rob_jatim
+            &width=${mapInstance.getSize().x}
+            &height=${mapInstance.getSize().y}
+            &bbox=${mapInstance.getBounds().toBBoxString()}
+            &x=${mapInstance.latLngToContainerPoint(e.latlng).x}
+            &y=${mapInstance.latLngToContainerPoint(e.latlng).y}`;
+
+            try {
+              const response = await axios.get(urlGetBahayaRob);
+              const geoJsonBahayaRob = response.data;
+              const bahayaRobValue =
+                geoJsonBahayaRob.features[0].properties.GRAY_INDEX;
+
+              L.popup()
+                .setLatLng(e.latlng)
+                .setContent("Index: " + bahayaRobValue + " pixel")
+                .openOn(mapInstance);
+            } catch (error) {
+              console.log(
+                "Oops, something went wrong while fetching WMS data",
+                error
+              );
+            }
+          });
+        } else {
+          // Remove WMS layer if showWMSLayer is false
+          mapInstance.eachLayer((layer) => {
+            if (layer instanceof L.TileLayer.WMS) {
+              mapInstance.removeLayer(layer);
+            }
+          });
+        }
+      } catch (error) {
+        console.log(
+          "Oops, something went wrong while fetching WMS data",
+          error
+        );
+      }
+    };
+
+    getWmsData();
+
+    return () => {
+      if (mapInstance) {
+        mapInstance.off("click");
+      }
+    };
+  }, [mapInstance, showWMSLayer]);
+
+  const handleWMSLayerToggle = () => {
+    setShowWMSLayer(!showWMSLayer);
+  };
+
+  const handleHighDangerToggle = () => {
+    setShowHighDanger(!showHighDanger);
+  };
+
+  const handleMediumDangerToggle = () => {
+    setShowMediumDanger(!showMediumDanger);
+  };
+
+  const handleLowDangerToggle = () => {
+    setShowLowDanger(!showLowDanger);
+  };
+
   return (
     <section>
-      {/* sidebar kiri */}
-      <div className="flex flex-col bg-[#FAFAF9] w-60 h-full font-poppins z-20 absolute">
-        <div className="flex-grow mx-5">
-          <h1 className="font-medium mt-3 mb-1">Data Layers</h1>
-          <Separator className="mb-2"/>
-          <CustomParameter
-            logo={<TbBorderStyle2 />}
-            parameter={"Batas Administrasi"}
-            // onClick={handleBatasClick}
-          />
-
-          <CustomParameter
-            logo={<TbHomeStats />}
-            parameter={"Persil Bangunan"}
-            // onClick={handleBangunanClick}
-          />
-
-          <CustomParameter
-            logo={<TiWavesOutline />}
-            parameter={"Ketinggian Rob"}
-            onClick={() => {
-              // handleRobClick;
-            }}
-          />
-
-          <CustomParameter
-            logo={<FaDigitalOcean />}
-            parameter={"Garis Pantai"}
-            // onClick={handleGarisPantaiClick}
-          />
-
-          <CustomParameter
-            logo={<TbBorderStyle2 />}
-            parameter={"Sungai"}
-            // onClick={handleSungaiClick}
-          />
-        </div>
-
-        <div className="mx-5 mb-2">
-          <Button
-            className="bg-[#007afc] hover:bg-[#1265ae] w-full"
-            // onClick={() => navigateToRobMonitor("/")}
-          >
-            <div className="flex items-center justify-center w-full gap-3">
-              <IoMdArrowRoundBack />
-              <p className="font-bold">
-                map<span className="font-extralight">rob</span>
-              </p>
-            </div>
-          </Button>
-        </div>
-      </div>
-
-      {/* sidebar kanan */}
-      <div className="flex flex-col bg-[#FAFAF9] w-60 h-full font-poppins z-20 absolute right-0">
-        <div className="flex-grow mx-5">
-          <h1 className="font-medium mt-3 mb-1 flex justify-center items-center">Legends</h1>
-          <Separator className="mb-2"/>
-          <p>tes legend</p>
+      <div className="flex flex-col bg-[#FAFAF9] w-60 h-44 font-poppins z-20 absolute rounded-md m-2">
+        <div className="m-2">
+          <div>
+            <h2>WFS: Bahaya Rob</h2>
+            <hr />
+            <input
+              type="checkbox"
+              id="toggleHighDanger"
+              checked={showHighDanger}
+              onChange={handleHighDangerToggle}
+            />
+            <label htmlFor="toggleHighDanger">Bahaya Rob Tinggi</label>
+            <br />
+            <input
+              type="checkbox"
+              id="toggleMediumDanger"
+              checked={showMediumDanger}
+              onChange={handleMediumDangerToggle}
+            />
+            <label htmlFor="toggleMediumDanger">Bahaya Rob Sedang</label>
+            <br />
+            <input
+              type="checkbox"
+              id="toggleLowDanger"
+              checked={showLowDanger}
+              onChange={handleLowDangerToggle}
+            />
+            <label htmlFor="toggleLowDanger">Bahaya Rob Rendah</label>
+          </div>
+          <div className="mt-2">
+            <h2>WMS : Index Bahaya Rob</h2>
+            <hr />
+            <input
+              type="checkbox"
+              id="toggleWMSLayer"
+              checked={showWMSLayer}
+              onChange={handleWMSLayerToggle}
+            />
+            <label htmlFor="toggleWMSLayer">Index</label>
+          </div>
         </div>
       </div>
       <div className="w-full h-screen z-0 absolute top-0">
@@ -101,4 +286,4 @@ const tesMapPlain = () => {
   );
 };
 
-export default tesMapPlain;
+export default MapPlain;
