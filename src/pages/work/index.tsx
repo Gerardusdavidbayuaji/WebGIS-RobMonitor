@@ -13,11 +13,13 @@ const MapPlain = () => {
   const [dangerLayer, setDangerLayer] = useState<L.LayerGroup<any> | null>(
     null
   );
+  const [showWMSBatasWilayah, setShowWMSBatasWilayah] = useState(false);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
   const [showMediumDanger, setShowMediumDanger] = useState(true);
   const [showHighDanger, setShowHighDanger] = useState(true);
   const [showLowDanger, setShowLowDanger] = useState(true);
   const [showWMSLayer, setShowWMSLayer] = useState(false);
+  const [legendImageUrl, setLegendImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
@@ -38,7 +40,7 @@ const MapPlain = () => {
     };
   }, []);
 
-  // useEffect untuk mendapatkan data GeoJSON dari WFS
+  // wfs bahaya rob
   useEffect(() => {
     const getDataGenangan = async () => {
       if (!mapInstance) return;
@@ -147,8 +149,9 @@ const MapPlain = () => {
     showLowDanger,
   ]);
 
+  // wms index bahaya rob
   useEffect(() => {
-    const getWmsData = async () => {
+    const getWmsIndexBahayaRob = async () => {
       if (!mapInstance) return;
 
       const urlBahayaRob = "http://localhost:8080/geoserver/rob_jatim/wms";
@@ -159,6 +162,7 @@ const MapPlain = () => {
             layers: "rob_jatim:bahaya_rob_jatim",
             format: "image/png",
             transparent: true,
+            styles: "bahaya_rob",
           });
           wmsLayer.addTo(mapInstance);
 
@@ -210,7 +214,7 @@ const MapPlain = () => {
       }
     };
 
-    getWmsData();
+    getWmsIndexBahayaRob();
 
     return () => {
       if (mapInstance) {
@@ -218,6 +222,63 @@ const MapPlain = () => {
       }
     };
   }, [mapInstance, showWMSLayer]);
+
+  //wms batas wilayah
+  useEffect(() => {
+    const getWmsBatasWilayah = async () => {
+      if (!mapInstance) return;
+
+      const urlBatasWilayah = "http://localhost:8080/geoserver/rob_jatim/wms?";
+
+      try {
+        if (showWMSBatasWilayah) {
+          const layerBatasWilayah = L.tileLayer.wms(urlBatasWilayah, {
+            layers: "rob_jatim:batas_wilayah",
+            format: "image/png",
+            transparent: true,
+            opacity: 0.3,
+            styles: "batas_wilayah",
+          });
+
+          layerBatasWilayah.addTo(mapInstance);
+        } else {
+          // Remove WMS layer if showWMSBatasWilayah is false
+          mapInstance.eachLayer((layer) => {
+            if (layer instanceof L.TileLayer.WMS) {
+              mapInstance.removeLayer(layer);
+            }
+          });
+        }
+      } catch (error) {
+        console.log(
+          "Oops, something went wrong while fetching WMS data",
+          error
+        );
+      }
+    };
+
+    getWmsBatasWilayah();
+  }, [mapInstance, showWMSBatasWilayah]);
+
+  useEffect(() => {
+    const fetchLegendImage = async () => {
+      const legendUrl =
+        "http://localhost:8080/geoserver/rob_jatim/wms?layer=rob_jatim%3Abatas_wilayah&request=GetLegendGraphic&service=WMS&version=1.1.0&style=batas_wilayah&format=image/png";
+
+      try {
+        const response = await axios.get(legendUrl, {
+          responseType: "arraybuffer",
+        });
+        const blob = new Blob([response.data], { type: "image/png" });
+        const imageUrl = URL.createObjectURL(blob);
+        setLegendImageUrl(imageUrl);
+      } catch (error) {
+        console.error("Error fetching legend image:", error);
+      }
+    };
+
+    fetchLegendImage();
+  }, []);
 
   const handleWMSLayerToggle = () => {
     setShowWMSLayer(!showWMSLayer);
@@ -235,12 +296,38 @@ const MapPlain = () => {
     setShowLowDanger(!showLowDanger);
   };
 
+  const handleWMSBatasWilayahToggle = () => {
+    setShowWMSBatasWilayah(!showWMSBatasWilayah);
+  };
+
+  const handleDownloadWMSData = () => {
+    const urlBahayaRobDownload =
+      "http://localhost:8080/geoserver/rob_jatim/wms";
+
+    // Buat URL untuk pengunduhan data tanpa parameter styles
+    const downloadUrl = `${urlBahayaRobDownload}?service=WMS&version=1.1.0&request=GetMap&layers=rob_jatim%3Abahaya_rob_jatim&bbox=113.380953022%2C-7.785339983%2C113.472671013%2C-7.720391788&width=768&height=543&srs=EPSG%3A4326&styles=&format=image%2Fgeotiff`;
+
+    // Buka tautan baru untuk mengunduh data
+    window.open(downloadUrl, "_blank");
+  };
+
+  const handleDownloadWFSData = () => {
+    const urlBahayaRobDownload =
+      "http://localhost:8080/geoserver/rob_jatim/ows";
+
+    // Buat URL untuk pengunduhan data tanpa parameter styles
+    const downloadUrl = `${urlBahayaRobDownload}?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Agenangan_rob_jatim&maxFeatures=50&outputFormat=shape-zip`;
+
+    // Buka tautan baru untuk mengunduh data
+    window.open(downloadUrl, "_blank");
+  };
+
   return (
     <section>
-      <div className="flex flex-col bg-[#FAFAF9] w-60 h-44 font-poppins z-20 absolute rounded-md m-2">
+      <div className="flex flex-col bg-white w-60 h-full font-poppins z-20 absolute">
         <div className="m-2">
           <div>
-            <h2>WFS: Bahaya Rob</h2>
+            <h2>WFS</h2>
             <hr />
             <input
               type="checkbox"
@@ -265,9 +352,12 @@ const MapPlain = () => {
               onChange={handleLowDangerToggle}
             />
             <label htmlFor="toggleLowDanger">Bahaya Rob Rendah</label>
+            <br />
+            <button onClick={handleDownloadWFSData}>Download Bahaya Rob</button>
           </div>
+
           <div className="mt-2">
-            <h2>WMS : Index Bahaya Rob</h2>
+            <h2>WMS</h2>
             <hr />
             <input
               type="checkbox"
@@ -276,6 +366,25 @@ const MapPlain = () => {
               onChange={handleWMSLayerToggle}
             />
             <label htmlFor="toggleWMSLayer">Index</label>
+            <br />
+            <input
+              type="checkbox"
+              id="toggleWMSBatasWilayah"
+              checked={showWMSBatasWilayah}
+              onChange={handleWMSBatasWilayahToggle}
+            />
+            <label htmlFor="toggleWMSBatasWilayah">Batas Wilayah</label>
+            <br />
+            <button onClick={handleDownloadWMSData}>
+              Download Index Bahaya Rob
+            </button>
+            <br />
+            {legendImageUrl && (
+              <div>
+                <h3>Legend Batas Wilayah</h3>
+                <img src={legendImageUrl} alt="Legend Batas Wilayah" />
+              </div>
+            )}
           </div>
         </div>
       </div>
