@@ -1,3 +1,8 @@
-import {getGenanganRob} from "./api";
+import {
+  getGenanganRob,
+  getPersilBangunan,
+  getIndexGenangan,
+  getSungai,
+} from "./api";
 
-export {getGenanganRob};
+export { getGenanganRob, getPersilBangunan, getIndexGenangan, getSungai };
