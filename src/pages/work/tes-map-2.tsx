@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import L from "leaflet";
@@ -12,26 +13,14 @@ const MapPlain = () => {
   const [dangerLayer, setDangerLayer] = useState<L.LayerGroup<any> | null>(
     null
   );
-  const [bangunanLayer, setBangunanLayer] = useState<L.LayerGroup<any> | null>(
-    null
-  );
-
-  const [sungaiLayer, setSungaiLayer] = useState<L.Layer | null>(null);
-
+  // const [showWMSBatasWilayah, setShowWMSBatasWilayah] = useState(false);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
-  const [showKantorPemerintahan, setShowKantorPemerintahan] = useState(false);
-  const [showTempatIbadah, setShowTempatIbadah] = useState(false);
-  const [showPerdagangan, setShowPerdagangan] = useState(false);
-  const [showPemukiman, setShowPemukiman] = useState(false);
-  const [showIndustri, setShowIndustri] = useState(false);
-  const [showSungai, setShowSungai] = useState(false);
-
   const [showMediumDanger, setShowMediumDanger] = useState(true);
   const [showHighDanger, setShowHighDanger] = useState(true);
   const [showLowDanger, setShowLowDanger] = useState(true);
   const [showWMSLayer, setShowWMSLayer] = useState(false);
+  // const [legendImageUrl, setLegendImageUrl] = useState<string | null>(null);
 
-  //basemape
   useEffect(() => {
     const map = L.map("map").setView([-7.749, 113.422], 13);
     const baseMap = L.tileLayer(
@@ -51,7 +40,7 @@ const MapPlain = () => {
     };
   }, []);
 
-  //wfs
+  // wfs bahaya rob
   useEffect(() => {
     const getDataGenangan = async () => {
       if (!mapInstance) return;
@@ -62,6 +51,8 @@ const MapPlain = () => {
       try {
         const response = await axios.get(urlGenangan);
         const geoJsonData = response.data;
+        console.log('tes', geoJsonData);
+        
 
         // Inisialisasi array untuk menyimpan data yang akan ditampilkan pada peta
         const filteredFeatures = [];
@@ -98,6 +89,7 @@ const MapPlain = () => {
           dangerLayer.removeFrom(mapInstance);
         }
 
+        // Buat layer baru dari data yang telah difilter
         // Buat layer baru dari data yang telah difilter
         const newDangerLayer = L.geoJson(filteredFeatures, {
           style: (feature) => {
@@ -149,155 +141,17 @@ const MapPlain = () => {
       }
     };
 
+    // Panggil fungsi untuk mendapatkan data GeoJSON ketika ada perubahan pada dependencies
     getDataGenangan();
   }, [
-    mapInstance,
-    showLowDanger,
-    showHighDanger,
     selectedDanger,
-    showMediumDanger,
-  ]);
-
-  useEffect(() => {
-    const getDataSungai = async () => {
-      if (!mapInstance) return;
-      const urlSungai =
-        "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Asungai&outputFormat=application%2Fjson";
-
-      try {
-        const responseSungai = await axios.get(urlSungai);
-        const geoJsonDataSungai = responseSungai.data;
-
-        // Hapus layer sungai yang sudah ada jika ada
-        if (sungaiLayer) {
-          sungaiLayer.removeFrom(mapInstance); // Hapus dari layer control
-          mapInstance.removeLayer(sungaiLayer); // Hapus dari peta
-        }
-
-        // Tampilkan data sungai hanya jika checkbox sungai dicentang
-        if (showSungai) {
-          const newSungaiLayer = L.geoJSON(geoJsonDataSungai, {
-            style: {
-              color: "blue",
-              weight: 1,
-              opacity: 1,
-            },
-            onEachFeature: function (feature, layer) {
-              if (feature && feature.properties && feature.properties.NAMOBJ) {
-                layer.bindPopup("sungai: " + feature.properties.NAMOBJ);
-              }
-            },
-          }).addTo(mapInstance);
-
-          setSungaiLayer(newSungaiLayer);
-        }
-      } catch (error) {
-        console.log(
-          "Oops, something went wrong while fetching sungai data",
-          error
-        );
-      }
-    };
-
-    getDataSungai();
-  }, [mapInstance, showSungai, sungaiLayer]);
-
-  useEffect(() => {
-    const getDataBangunan = async () => {
-      if (!mapInstance) return;
-      const urlBangunan =
-        "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abangunan&outputFormat=application%2Fjson";
-
-      try {
-        const responseBangunan = await axios.get(urlBangunan);
-        const geoJsonDataBangunan = responseBangunan.data;
-
-        const filteredFeatures = geoJsonDataBangunan.features.filter(
-          (feature: { properties: { Tipe_Bangu: any } }) => {
-            const tipeBangunan = feature?.properties?.Tipe_Bangu;
-
-            // Tambahkan logika untuk mengecek status checkbox dan jenis bangunan
-            return (
-              (showIndustri && tipeBangunan === "Industri/Gedung") ||
-              (showPemukiman && tipeBangunan === "Pemukiman") ||
-              (showPerdagangan && tipeBangunan === "Perdagangan/Jasa") ||
-              (showTempatIbadah && tipeBangunan === "Tempat Ibadah") ||
-              (showKantorPemerintahan && tipeBangunan === "Kantor Pemeintahan")
-            );
-          }
-        );
-
-        // Hapus layer bangunan yang sudah ada jika ada
-        // Anda dapat menambahkan ini setelah mendapatkan daftar fitur yang difilter
-        if (bangunanLayer) {
-          bangunanLayer.removeFrom(mapInstance);
-        }
-
-        // Buat layer baru dari data yang telah difilter
-        const newBangunanLayer = L.geoJSON(filteredFeatures, {
-          style: (feature) => {
-            let color;
-            switch (feature?.properties?.Tipe_Bangu) {
-              case "Industri/Gedung":
-                color = "#86469C";
-                break;
-              case "Pemukiman":
-                color = "#BC7FCD";
-                break;
-              case "Perdagangan/Jasa":
-                color = "#FB9AD1";
-                break;
-              case "Tempat Ibadah":
-                color = "#FFCDEA";
-                break;
-              case "Kantor Pemeintahan":
-                color = "#99BC85";
-                break;
-              default:
-                color = "blue";
-            }
-            return {
-              color: color,
-              fillOpacity: 0.5,
-              weight: 1,
-              opacity: 1,
-            };
-          },
-          onEachFeature: function (feature, layer) {
-            if (
-              feature &&
-              feature.properties &&
-              feature.properties.Tipe_Bangu
-            ) {
-              layer.bindPopup("bangunan: " + feature.properties.Tipe_Bangu);
-            }
-          },
-        }).addTo(mapInstance);
-
-        // Perbarui state untuk menyimpan layer bangunan yang baru
-        setBangunanLayer(newBangunanLayer);
-
-        // Perbesar peta agar sesuai dengan batas layer bangunan yang baru
-        mapInstance.fitBounds(newBangunanLayer.getBounds());
-      } catch (error) {
-        console.log(
-          "Oops, something went wrong while fetching Bangunan data",
-          error
-        );
-      }
-    };
-
-    getDataBangunan();
-  }, [
     mapInstance,
-    showIndustri,
-    showPemukiman,
-    showPerdagangan,
-    showTempatIbadah,
-    showKantorPemerintahan,
+    showHighDanger,
+    showMediumDanger,
+    showLowDanger,
   ]);
 
-  // wms
+  // wms index bahaya rob
   useEffect(() => {
     const getWmsIndexBahayaRob = async () => {
       if (!mapInstance) return;
@@ -371,6 +225,65 @@ const MapPlain = () => {
     };
   }, [mapInstance, showWMSLayer]);
 
+  // //wms batas wilayah
+  // useEffect(() => {
+  //   const getWmsBatasWilayah = async () => {
+  //     if (!mapInstance) return;
+
+  //     const urlBatasWilayah = "http://localhost:8080/geoserver/rob_jatim/wms?";
+
+  //     try {
+  //       if (showWMSBatasWilayah) {
+  //         const layerBatasWilayah = L.tileLayer.wms(urlBatasWilayah, {
+  //           layers: "rob_jatim:batas_wilayah",
+  //           format: "image/png",
+  //           transparent: true,
+  //           opacity: 0.3,
+  //           styles: "batas_wilayah",
+  //         });
+
+  //         layerBatasWilayah.addTo(mapInstance);
+  //       } else {
+  //         // Remove WMS layer if showWMSBatasWilayah is false
+  //         mapInstance.eachLayer((layer) => {
+  //           if (layer instanceof L.TileLayer.WMS) {
+  //             mapInstance.removeLayer(layer);
+  //           }
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.log(
+  //         "Oops, something went wrong while fetching WMS data",
+  //         error
+  //       );
+  //     }
+  //   };
+
+  //   getWmsBatasWilayah();
+  // }, [mapInstance, showWMSBatasWilayah]);
+
+  // useEffect(() => {
+  //   const fetchLegendImage = async () => {
+  //     const legendUrl =
+  //       "http://localhost:8080/geoserver/rob_jatim/wms?layer=rob_jatim%3Agenangan_rob_jatim&request=GetLegendGraphic&service=WMS&version=1.1.0&style=batas_wilayah&format=image/png";
+
+  //     try {
+  //       const response = await axios.get(legendUrl, {
+  //         responseType: "arraybuffer",
+  //       });
+  //       const blob = new Blob([response.data], { type: "image/png" });
+  //       const imageUrl = URL.createObjectURL(blob);
+  //       setLegendImageUrl(imageUrl);
+  //     } catch (error) {
+  //       console.error("Error fetching legend image:", error);
+  //     }
+  //   };
+
+  //   fetchLegendImage();
+  // }, []);
+
+  //fungsi handle click
+
   const handleWMSLayerToggle = () => {
     setShowWMSLayer(!showWMSLayer);
   };
@@ -387,29 +300,20 @@ const MapPlain = () => {
     setShowLowDanger(!showLowDanger);
   };
 
-  const handleSungaiToggle = () => {
-    setShowSungai(!showSungai);
-  };
+  // const handleWMSBatasWilayahToggle = () => {
+  //   setShowWMSBatasWilayah(!showWMSBatasWilayah);
+  // };
 
-  const handleIndustriToggle = () => {
-    setShowIndustri(!showIndustri);
-  };
+  //fungsi handle download
 
-  const handlePemukimanToggle = () => {
-    setShowPemukiman(!showPemukiman);
-  };
+  // const handleDownloadWMSData = () => {
+  //   const urlBahayaRobDownload =
+  //     "http://localhost:8080/geoserver/rob_jatim/wms";
 
-  const handlePerdaganganToggle = () => {
-    setShowPerdagangan(!showPerdagangan);
-  };
+  //   const downloadUrl = `${urlBahayaRobDownload}?service=WMS&version=1.1.0&request=GetMap&layers=rob_jatim%3Abahaya_rob_jatim&bbox=113.380953022%2C-7.785339983%2C113.472671013%2C-7.720391788&width=768&height=543&srs=EPSG%3A4326&styles=&format=image%2Fgeotiff`;
 
-  const handleTempatIbadahToggle = () => {
-    setShowTempatIbadah(!showTempatIbadah);
-  };
-
-  const handleKantorPemerintahanToggle = () => {
-    setShowKantorPemerintahan(!showKantorPemerintahan);
-  };
+  //   window.open(downloadUrl, "_blank");
+  // };
 
   const handleDownloadWFSData = () => {
     const urlBahayaRobDownload =
@@ -452,55 +356,8 @@ const MapPlain = () => {
             <label htmlFor="toggleLowDanger">Bahaya Rob Rendah</label>
             <br />
             <button onClick={handleDownloadWFSData}>Download Bahaya Rob</button>
-            <br />
-            <input
-              type="checkbox"
-              id="toggleSungai"
-              checked={showSungai}
-              onChange={handleSungaiToggle}
-            />
-            <label htmlFor="toggleSungai">Sungai</label>
-            <br />
-            <input
-              type="checkbox"
-              id="toggleIndustri"
-              checked={showIndustri}
-              onChange={handleIndustriToggle}
-            />
-            <label htmlFor="toggleIndustri">Industri/Gedung</label>
-            <br />
-            <input
-              type="checkbox"
-              id="togglePemrintahan"
-              checked={showKantorPemerintahan}
-              onChange={handleKantorPemerintahanToggle}
-            />
-            <label htmlFor="togglePemrintahan">Kantor Pemerintahan</label>
-            <br />
-            <input
-              type="checkbox"
-              id="togglePemukiman"
-              checked={showPemukiman}
-              onChange={handlePemukimanToggle}
-            />
-            <label htmlFor="togglePemukiman">Pemukiman</label>
-            <br />
-            <input
-              type="checkbox"
-              id="togglePerdagangan"
-              checked={showPerdagangan}
-              onChange={handlePerdaganganToggle}
-            />
-            <label htmlFor="togglePerdagangan">Perdagangan</label>
-            <br />
-            <input
-              type="checkbox"
-              id="toggleTempatIbadah"
-              checked={showTempatIbadah}
-              onChange={handleTempatIbadahToggle}
-            />
-            <label htmlFor="toggleTempatIbadah">Tempat Ibadah</label>
           </div>
+
           <div className="mt-2">
             <h2>WMS</h2>
             <hr />
@@ -511,6 +368,25 @@ const MapPlain = () => {
               onChange={handleWMSLayerToggle}
             />
             <label htmlFor="toggleWMSLayer">Index</label>
+            {/* <br />
+            <input
+              type="checkbox"
+              id="toggleWMSBatasWilayah"
+              checked={showWMSBatasWilayah}
+              onChange={handleWMSBatasWilayahToggle}
+            />
+            <label htmlFor="toggleWMSBatasWilayah">Batas Wilayah</label> */}
+            {/* <br />
+            <button onClick={handleDownloadWMSData}>
+              Download Index Bahaya Rob
+            </button>
+            <br />
+            {legendImageUrl && (
+              <div>
+                <h3>Legend Batas Wilayah</h3>
+                <img src={legendImageUrl} alt="Legend Batas Wilayah" />
+              </div>
+            )} */}
           </div>
         </div>
       </div>
