@@ -14,8 +14,11 @@ import {
 } from "@/components/ui/form";
 
 const FormSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: z.string().min(1, "Email is required").email("Invalid email"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must have then 8 characters"),
 });
 
 const CustomForm = () => {
@@ -23,8 +26,8 @@ const CustomForm = () => {
     resolver: zodResolver(FormSchema),
   });
 
-  const onSubmit = () => {
-    console.log("form submited");
+  const onSubmit = (values: z.infer<typeof FormSchema>) => {
+    console.log(values);
   };
 
   return (
@@ -51,7 +54,11 @@ const CustomForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter Your Password" {...field} />
+                  <Input
+                    placeholder="Enter Your Password"
+                    type="password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
