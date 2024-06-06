@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { HiOutlineGlobe } from "react-icons/hi";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   Dialog,
@@ -12,9 +13,20 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "@/components/ui/button";
+import SignInForm from "./form/SignInForm";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleRegister = () => {
+    // Add your register logic here
+    toast({
+      variant: "destructive",
+      title: "Registered",
+      description: "Your account has been created.",
+    });
+  };
 
   return (
     <nav className="bg-white text-black sticky top-0 z-50 flex items-center justify-between w-full px-6 py-3">
@@ -33,42 +45,11 @@ const Navbar = () => {
           Insights
         </p>
         <div className="flex items-center gap-2 text-black cursor-pointer">
-          <Dialog>
-            <DialogTrigger>
-              <p className="text-sm font-medium">Log In</p>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Login Account</DialogTitle>
-                <DialogDescription>
-                  Login to your account using email
-                </DialogDescription>
-                <div className="grid w-full items-center gap-1.5 pt-4">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    placeholder="johndue@gmail.com"
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className="grid w-full items-center gap-1.5 pt-4 pb-3">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    type="password"
-                    id="password"
-                    placeholder="Password 8 character"
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <Button className="rounded-lg w-24 bg-[#292929]">
-                    Login
-                  </Button>
-                </div>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          <SignInForm
+            title="Sign In"
+            subtitle="Sign In Account"
+            description="Sign in to your account using email"
+          />
           <Dialog>
             <DialogTrigger>
               <button className="rounded-full text-white bg-[#007afc] hover:bg-[#1265ae] text-sm font-medium w-20 h-8">
@@ -79,14 +60,14 @@ const Navbar = () => {
               <DialogHeader>
                 <DialogTitle>Register Account</DialogTitle>
                 <DialogDescription>
-                  Register your account now to get full acces
+                  Register your account now to get full access
                 </DialogDescription>
                 <div className="grid w-full items-center gap-1.5 pt-4">
                   <Label htmlFor="name">Full Name</Label>
                   <Input
-                    type="name"
+                    type="text"
                     id="name"
-                    placeholder="John Due"
+                    placeholder="John Doe"
                     className="rounded-lg"
                   />
                 </div>
@@ -95,7 +76,7 @@ const Navbar = () => {
                   <Input
                     type="email"
                     id="email"
-                    placeholder="jhondue@gmail.com"
+                    placeholder="johndoe@gmail.com"
                     className="rounded-lg"
                   />
                 </div>
@@ -109,16 +90,19 @@ const Navbar = () => {
                   />
                 </div>
                 <div className="grid w-full items-center gap-1.5 pt-4 pb-3">
-                  <Label htmlFor="password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
                   <Input
                     type="password"
-                    id="password"
+                    id="confirm-password"
                     placeholder="Confirm password"
                     className="rounded-lg"
                   />
                 </div>
                 <div className="flex justify-end">
-                  <Button className="rounded-lg w-24 bg-[#292929]">
+                  <Button
+                    className="rounded-lg w-24 bg-[#292929]"
+                    onClick={handleRegister}
+                  >
                     Register
                   </Button>
                 </div>
