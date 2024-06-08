@@ -22,7 +22,9 @@ const SignInForm = (props: Props) => {
     <div>
       <Dialog>
         <DialogTrigger>
-          <p className="text-sm font-medium">{title}</p>
+          <p className="text-sm font-medium hover:text-[#007afc] transition duration-300 ease-in-out">
+            {title}
+          </p>
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
