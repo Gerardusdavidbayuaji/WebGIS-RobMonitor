@@ -12,7 +12,12 @@ const Navbar = () => {
         <span>
           <HiOutlineGlobe />
         </span>
-        <div className="font-poppins text-2xl font-semibold">maprob</div>
+        <div
+          className="font-poppins text-2xl font-semibold cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          maprob
+        </div>
       </div>
 
       <div className="flex items-center gap-5 text-black cursor-pointer">
