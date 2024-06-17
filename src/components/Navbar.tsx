@@ -27,7 +27,7 @@ const Navbar = () => {
             subtitle="Sign In Account"
             description="Sign in to your account using email"
           />
-          <div className="flex items-center justify-center rounded-full text-white bg-[#007afc] hover:bg-[#1265ae] text-sm font-medium w-20 h-8 cursor-pointer">
+          <div className="flex items-center justify-center rounded-full text-white bg-[#ff6d1f] hover:bg-[#fa6415] text-sm font-medium w-20 h-8 cursor-pointer">
             <SignUpForm
               title="Sign Up"
               subtitle="Sign Up Account"

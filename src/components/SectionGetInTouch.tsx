@@ -30,7 +30,9 @@ const SectionGetInTouch = () => {
         </div>
         <div className="col-start-9 col-span-3 flex justify-end text-white">
           <p className="font-poppins text-sm font-semibold mt-16">
-            MapRob is a platform designed for interacting with spatial data visualizing geographical patterns and<br /> analyzing spatial relationships.
+            MapRob is a platform designed for interacting with spatial data
+            visualizing geographical patterns and
+            <br /> analyzing spatial relationships.
           </p>
         </div>
         <div className="col-start-2 col-span-10 mt-10 text-[#292929]">
