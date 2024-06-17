@@ -18,10 +18,10 @@ const CardBaseMap = () => {
     <div className="fixed flex items-center justify-between top-0 left-0 right-0 p-4 z-10 w-full">
       <div className="flex items-center">
         <span>
-          <HiOutlineGlobe />
+          <HiOutlineGlobe color="#ff6d1f" />
         </span>
         <div
-          className="font-poppins text-2xl font-semibold cursor-pointer"
+          className="font-poppins text-3xl font-semibold cursor-pointer text-[#ff6d1f]"
           onClick={() => navigate("/")}
         >
           maprob
@@ -29,23 +29,23 @@ const CardBaseMap = () => {
       </div>
 
       <div className="flex gap-4">
-        <div className="bg-white w-[185px] rounded-md p-2 border border-solid">
+        <div className="bg-[#292929] border border-[#94949469] w-[185px] rounded-md p-2 ">
           <div className="flex gap-4 items-center">
-            <FiSearch color="black" />
+            <FiSearch className="h-5 w-5" color="#94949469" />
             <input
               type="search"
               placeholder="Search Data Layers"
-              className="bg-transparent outline-none text-black text-sm w-full placeholder:text-sm placeholder:italic"
+              className="bg-transparent outline-none text-[#94949469] text-sm w-full placeholder:text-sm placeholder:italic"
             />
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <div className="p-2 bg-white rounded-md">
-              <Layers className="h-5 w-5" />
+            <div className="p-2 bg-[#292929] border border-[#94949469] rounded-md">
+              <Layers className="h-5 w-5" color="#94949469" />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="mr-4 mt-2">
+          <DropdownMenuContent className="bg-[#292929] border border-[#94949469] mr-4 mt-2">
             <div className="flex">
               <DropdownMenuItem>
                 <div className="items-center justify-center cursor-pointer">

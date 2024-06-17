@@ -9,7 +9,7 @@ const Basemap = () => {
       5
     );
     const baseMap = L.tileLayer(
-      "https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=AW8IuG306IIk8kNdxEw6",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
       {
         attribution:
           '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
