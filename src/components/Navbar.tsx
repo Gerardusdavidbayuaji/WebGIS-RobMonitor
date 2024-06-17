@@ -21,21 +21,6 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-5 text-black cursor-pointer">
-        <div className="flex mr-5 gap-5">
-          <p
-            className="text-sm font-medium hover:text-[#007afc] transition duration-300 ease-in-out"
-            onClick={() => navigate("/studio")}
-          >
-            Studio
-          </p>
-          <p
-            className="text-sm font-medium hover:text-[#007afc] transition duration-300 ease-in-out"
-            onClick={() => navigate("/insight")}
-          >
-            Insights
-          </p>
-        </div>
-
         <div className="flex items-center gap-2 text-black cursor-pointer">
           <SignInForm
             title="Sign In"

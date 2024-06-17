@@ -53,7 +53,7 @@ const CustomSignUpForm = () => {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Admin Rob" {...field} />
+                  <Input placeholder="e.g: admin_rob" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -66,7 +66,7 @@ const CustomSignUpForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="adminrob@gmail.com" {...field} />
+                  <Input placeholder="e.g: admin_rob@gmail.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -94,10 +94,10 @@ const CustomSignUpForm = () => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Re-Enter Your Password</FormLabel>
+                <FormLabel>Confirm password</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Re-Enter Your Password"
+                    placeholder="Confirm password"
                     type="password"
                     {...field}
                   />
