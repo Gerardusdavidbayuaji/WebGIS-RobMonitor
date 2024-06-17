@@ -23,9 +23,9 @@ const Sidebar = (props: SidebarProps) => {
       }`}
     >
       {activateParam && (
-        <div className="h-4/6 min-h-[525px] w-1/4 min-w-[237px] bg-white rounded-lg">
-          <p className="flex items-center justify-center">
-            sidebar {activateParam}
+        <div className="bg-[#292929] border border-[#94949469] h-4/6 min-h-[525px] w-1/4 min-w-[237px] rounded-lg">
+          <p className="flex text-[#ff6d1f] items-center justify-center m-2">
+            Sidebar {activateParam}
           </p>
         </div>
       )}
