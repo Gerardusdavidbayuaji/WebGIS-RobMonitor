@@ -1,8 +1,17 @@
 import {
   getGenanganRob,
   getPersilBangunan,
-  getIndexGenangan,
   getSungai,
+  getTitikValdasi,
+  getGarisPantai,
+  getBatasWilayah,
 } from "./api";
 
-export { getGenanganRob, getPersilBangunan, getIndexGenangan, getSungai };
+export {
+  getGenanganRob,
+  getPersilBangunan,
+  getSungai,
+  getTitikValdasi,
+  getGarisPantai,
+  getBatasWilayah,
+};
