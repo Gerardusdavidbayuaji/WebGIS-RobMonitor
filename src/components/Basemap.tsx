@@ -1,27 +1,50 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const Basemap = () => {
+interface BasemapProps {
+  data: any;
+  zoomToData: any;
+}
+
+const Basemap = ({ data, zoomToData }: BasemapProps) => {
+  const mapRef = useRef<L.Map | null>(null);
+  const layerRef = useRef<L.GeoJSON | null>(null);
+  const [showData, setShowData] = useState(false);
+
   useEffect(() => {
-    const map = L.map("map", { zoomControl: false }).setView(
-      [-2.18, 115.795],
-      5
-    );
-    const baseMap = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
-      {
-        attribution:
-          '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-      }
-    );
+    if (!mapRef.current) {
+      mapRef.current = L.map("map", { zoomControl: false }).setView(
+        [-2.18, 115.795],
+        5
+      );
+      const baseMap = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        }
+      );
+      baseMap.addTo(mapRef.current);
+    }
 
-    baseMap.addTo(map);
+    if (layerRef.current) {
+      mapRef.current?.removeLayer(layerRef.current);
+    }
 
-    return () => {
-      map.remove();
-    };
-  }, []);
+    if (data && showData) {
+      layerRef.current = L.geoJSON(data).addTo(mapRef.current);
+    }
+
+    if (zoomToData && mapRef.current) {
+      const layer = L.geoJSON(zoomToData);
+      const bounds = layer.getBounds();
+      mapRef.current.flyToBounds(bounds, { maxZoom: 14 });
+
+      // Setelah selesai zoom, tampilkan data
+      setShowData(true);
+    }
+  }, [data, zoomToData, showData]);
 
   return (
     <div className="w-full h-screen z-0 absolute top-0">
