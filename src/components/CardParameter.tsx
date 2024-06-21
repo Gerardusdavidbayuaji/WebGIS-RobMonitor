@@ -27,7 +27,7 @@ const CardParameter = (props: CardParametersProps) => {
                 ? "bg-[#ff6d1f] text-white"
                 : "bg-[#e3e1dc98] hover:bg-[#94949469]"
             }`}
-            onClick={handleEyeclick}
+            onClick={() => onToggle(title)}
           >
             <Eye className="my-1 mx-2" />
           </button>
@@ -40,7 +40,7 @@ const CardParameter = (props: CardParametersProps) => {
                 ? "bg-[#ff6d1f] text-white"
                 : "bg-[#e3e1dc98] hover:bg-[#94949469]"
             }`}
-            onClick={() => onToggle(title)}
+            onClick={handleEyeclick}
           >
             <Map className="my-1 mx-2" />
           </button>
