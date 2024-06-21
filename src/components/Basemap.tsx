@@ -42,7 +42,9 @@ const Basemap = ({ data, zoomToData }: BasemapProps) => {
       mapRef.current.flyToBounds(bounds, { maxZoom: 14 });
 
       // Setelah selesai zoom, tampilkan data
-      setShowData(true);
+      mapRef.current.once("zoomend", () => {
+        setShowData(true);
+      });
     }
   }, [data, zoomToData, showData]);
 
