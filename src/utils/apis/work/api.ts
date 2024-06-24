@@ -64,12 +64,12 @@ export const getGarisPantai = async () => {
   }
 };
 
-export const getBatasWilayah = async () => {
-  const urlBatasWilayah =
-    "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abatas_wilayah&outputFormat=application%2Fjson";
+export const getBatasKecamatan = async () => {
+  const urlBatasKecamatan =
+    "http://localhost:8080/geoserver/rob_jatim/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rob_jatim%3Abatas_kecamatan&outputFormat=application%2Fjson";
 
   try {
-    const response = await axios.get(urlBatasWilayah);
+    const response = await axios.get(urlBatasKecamatan);
     return response.data;
   } catch (error: any) {
     console.log("Oops, somthing went wrong while fetching data", error);

@@ -4,7 +4,7 @@ import {
   getSungai,
   getTitikValdasi,
   getGarisPantai,
-  getBatasWilayah,
+  getBatasKecamatan,
 } from "./api";
 
 export {
@@ -13,5 +13,5 @@ export {
   getSungai,
   getTitikValdasi,
   getGarisPantai,
-  getBatasWilayah,
+  getBatasKecamatan,
 };
