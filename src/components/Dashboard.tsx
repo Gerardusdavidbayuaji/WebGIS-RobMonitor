@@ -31,10 +31,7 @@ const Dashboard = () => {
           case "Bahaya Rob Rendah":
           case "Bahaya Rob Sedang":
           case "Bahaya Rob Tinggi":
-            // Fetch data from API
             const genanganRobData = await getGenanganRob();
-
-            // Filter data based on layer property
             result = genanganRobData.features.filter(
               (feature: any) => feature.properties.layer === param
             );

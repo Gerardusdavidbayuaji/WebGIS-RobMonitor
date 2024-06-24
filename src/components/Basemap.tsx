@@ -35,9 +35,111 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
 
     Object.keys(dataLayers).forEach((key) => {
       if (mapRef.current) {
-        layerRefs.current[key] = L.geoJSON(dataLayers[key]).addTo(
-          mapRef.current
-        );
+        switch (key) {
+          case "Bahaya Rob Rendah":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: () => ({
+                fillColor: "#5DAE8B",
+                fillOpacity: 0.8,
+                stroke: false,
+              }),
+            }).addTo(mapRef.current);
+            break;
+          case "Bahaya Rob Sedang":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: () => ({
+                fillColor: "#F6F49D",
+                fillOpacity: 0.8,
+                stroke: false,
+              }),
+            }).addTo(mapRef.current);
+            break;
+          case "Bahaya Rob Tinggi":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: () => ({
+                fillColor: "#FF7676",
+                fillOpacity: 0.8,
+                stroke: false,
+              }),
+            }).addTo(mapRef.current);
+            break;
+          case "Batas Kecamatan":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: {
+                color: "#9DB2BF",
+                weight: 1,
+                opacity: 1,
+              },
+            }).addTo(mapRef.current);
+            break;
+          case "Garis Pantai":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: {
+                color: "#9DB2BF",
+                weight: 1,
+                opacity: 1,
+              },
+            }).addTo(mapRef.current);
+            break;
+          case "Persil Bangunan":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: (feature: any) => {
+                let color = "blue";
+                switch (feature.properties.tipe) {
+                  case "Industri/Gedung":
+                    color = "#86469C";
+                    break;
+                  case "Pemukiman":
+                    color = "#FF5B22";
+                    break;
+                  case "Perdagangan/Jasa":
+                    color = "#FB9AD1";
+                    break;
+                  case "Tempat Ibadah":
+                    color = "#FFCDEA";
+                    break;
+                  case "Kantor Pemeintahan":
+                    color = "#99BC85";
+                    break;
+                  default:
+                    color = "blue";
+                }
+                return {
+                  color: color,
+                  fillOpacity: 0.5,
+                  weight: 1,
+                  opacity: 1,
+                };
+              },
+            }).addTo(mapRef.current);
+            break;
+          case "Sungai":
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              style: {
+                fillColor: "#6DB9EF",
+                fillOpacity: 1,
+                stroke: false,
+              },
+            }).addTo(mapRef.current);
+            break;
+          case "Titik Validasi":
+            const validationIcon = L.icon({
+              iconUrl: "/public/assets/validation-icon-1.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            });
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              pointToLayer: (_feature: any, latlng: L.LatLngExpression) => {
+                return L.marker(latlng, { icon: validationIcon });
+              },
+            }).addTo(mapRef.current);
+            break;
+          default:
+            layerRefs.current[key] = L.geoJSON(dataLayers[key]).addTo(
+              mapRef.current
+            );
+            break;
+        }
       }
     });
 
