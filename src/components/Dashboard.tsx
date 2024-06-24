@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
+import {
+  getGenanganRob,
+  getPersilBangunan,
+  getSungai,
+  getTitikValdasi,
+  getGarisPantai,
+  getBatasKecamatan,
+} from "@/utils/apis/work";
 import CardParameter from "@/components/CardParameter";
 import CardBaseMap from "@/components/CardBaseMap";
 import Basemap from "@/components/Basemap";
 import Sidebar from "@/components/Sidebar";
-import { getGenanganRob } from "@/utils/apis/work";
 
 const Dashboard = () => {
   const [activateParam, setActivateParam] = useState<string | null>(null);
@@ -13,30 +20,54 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getGenanganRob();
-        setData(result);
-        if (activateParam === "Bahaya Rob Rendah") {
+        let result;
+        switch (activateParam) {
+          case "Bahaya Rob Rendah":
+          case "Bahaya Rob Sedang":
+          case "Bahaya Rob Tinggi":
+            result = await getGenanganRob();
+            break;
+          case "Persil Bangunan":
+            result = await getPersilBangunan();
+            break;
+          case "Sungai":
+            result = await getSungai();
+            break;
+          case "Titik Validasi":
+            result = await getTitikValdasi();
+            break;
+          case "Garis Pantai":
+            result = await getGarisPantai();
+            break;
+          case "Batas Kecamatan":
+            result = await getBatasKecamatan();
+            break;
+          default:
+            result = null;
+            break;
+        }
+
+        if (result) {
+          setData(result);
           setZoomToData(result);
+        } else {
+          setData(null);
+          setZoomToData(null);
         }
       } catch (error) {
         console.error("Failed to fetch data", error);
       }
     };
 
-    if (activateParam == "Bahaya Rob Rendah") {
-      fetchData();
-    } else {
-      setData(null);
-      setZoomToData(null);
-    }
+    fetchData();
   }, [activateParam]);
 
   const toggleSideBar = (param: string) => {
-    setActivateParam(activateParam === param ? null : param);
+    setActivateParam((currentParam) => (currentParam === param ? null : param));
   };
 
   const handleZoomToData = (param: string) => {
-    if (param === "Bahaya Rob Rendah") {
+    if (param === activateParam) {
       setZoomToData(data);
     }
   };
@@ -45,9 +76,11 @@ const Dashboard = () => {
     "Bahaya Rob Rendah",
     "Bahaya Rob Sedang",
     "Bahaya Rob Tinggi",
-    "Persil Bangunan",
     "Batas Kecamatan",
+    "Garis Pantai",
+    "Persil Bangunan",
     "Sungai",
+    "Titik Validasi",
   ];
 
   return (
