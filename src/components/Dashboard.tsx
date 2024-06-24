@@ -13,19 +13,32 @@ import Basemap from "@/components/Basemap";
 import Sidebar from "@/components/Sidebar";
 
 const Dashboard = () => {
-  const [activateParam, setActivateParam] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
+  const [activeParams, setActiveParams] = useState<string[]>([]);
+  const [dataLayers, setDataLayers] = useState<any>({
+    "Bahaya Rob Rendah": null,
+    "Bahaya Rob Sedang": null,
+    "Bahaya Rob Tinggi": null,
+  });
   const [zoomToData, setZoomToData] = useState<any>(null);
+  const [lastParam, setLastParam] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (param: string) => {
       try {
         let result;
-        switch (activateParam) {
+
+        switch (param) {
           case "Bahaya Rob Rendah":
           case "Bahaya Rob Sedang":
           case "Bahaya Rob Tinggi":
-            result = await getGenanganRob();
+            // Fetch data from API
+            const genanganRobData = await getGenanganRob();
+
+            // Filter data based on layer property
+            result = genanganRobData.features.filter(
+              (feature: any) => feature.properties.layer === param
+            );
+
             break;
           case "Persil Bangunan":
             result = await getPersilBangunan();
@@ -48,27 +61,34 @@ const Dashboard = () => {
         }
 
         if (result) {
-          setData(result);
+          setDataLayers((prevLayers: any) => ({
+            ...prevLayers,
+            [param]: result,
+          }));
           setZoomToData(result);
-        } else {
-          setData(null);
-          setZoomToData(null);
         }
       } catch (error) {
         console.error("Failed to fetch data", error);
       }
     };
 
-    fetchData();
-  }, [activateParam]);
+    if (lastParam) {
+      fetchData(lastParam);
+    }
+  }, [lastParam]);
 
   const toggleSideBar = (param: string) => {
-    setActivateParam((currentParam) => (currentParam === param ? null : param));
+    setActiveParams((currentParams) =>
+      currentParams.includes(param)
+        ? currentParams.filter((p) => p !== param)
+        : [...currentParams, param]
+    );
+    setLastParam(param);
   };
 
   const handleZoomToData = (param: string) => {
-    if (param === activateParam) {
-      setZoomToData(data);
+    if (param === lastParam) {
+      setZoomToData(dataLayers[param]);
     }
   };
 
@@ -85,14 +105,14 @@ const Dashboard = () => {
 
   return (
     <div className="relative min-h-screen">
-      <Basemap data={data} zoomToData={zoomToData} />
+      <Basemap dataLayers={dataLayers} zoomToData={zoomToData} />
       <div className="fixed bottom-0 left-0 right-0 p-4 z-10 mb-2">
         <div className="flex space-x-4 overflow-x-auto">
           {parameters.map((param) => (
             <CardParameter
               key={param}
               title={param}
-              isActive={activateParam === param}
+              isActive={activeParams.includes(param)}
               onToggle={toggleSideBar}
               onEyeClick={handleZoomToData}
             />
@@ -100,7 +120,7 @@ const Dashboard = () => {
         </div>
       </div>
       <CardBaseMap />
-      <Sidebar activateParam={activateParam} />
+      <Sidebar activateParam={lastParam} />
     </div>
   );
 };

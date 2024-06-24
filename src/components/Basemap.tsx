@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 interface BasemapProps {
-  data: any;
+  dataLayers: any;
   zoomToData: any;
 }
 
-const Basemap = ({ data, zoomToData }: BasemapProps) => {
+const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
   const mapRef = useRef<L.Map | null>(null);
-  const layerRef = useRef<L.GeoJSON | null>(null);
-  const [showData, setShowData] = useState(false);
+  const layerRefs = useRef<any>({});
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -28,25 +27,26 @@ const Basemap = ({ data, zoomToData }: BasemapProps) => {
       baseMap.addTo(mapRef.current);
     }
 
-    if (layerRef.current) {
-      mapRef.current?.removeLayer(layerRef.current);
-    }
+    Object.keys(layerRefs.current).forEach((key) => {
+      if (mapRef.current && layerRefs.current[key]) {
+        mapRef.current.removeLayer(layerRefs.current[key]);
+      }
+    });
 
-    if (data && showData) {
-      layerRef.current = L.geoJSON(data).addTo(mapRef.current);
-    }
+    Object.keys(dataLayers).forEach((key) => {
+      if (mapRef.current) {
+        layerRefs.current[key] = L.geoJSON(dataLayers[key]).addTo(
+          mapRef.current
+        );
+      }
+    });
 
     if (zoomToData && mapRef.current) {
       const layer = L.geoJSON(zoomToData);
       const bounds = layer.getBounds();
       mapRef.current.flyToBounds(bounds, { maxZoom: 14 });
-
-      // Setelah selesai zoom, tampilkan data
-      mapRef.current.once("zoomend", () => {
-        setShowData(true);
-      });
     }
-  }, [data, zoomToData, showData]);
+  }, [dataLayers, zoomToData]);
 
   return (
     <div className="w-full h-screen z-0 absolute top-0">
