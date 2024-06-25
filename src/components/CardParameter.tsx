@@ -1,4 +1,4 @@
-import { Eye, Waypoints, Map } from "lucide-react";
+import { Eye, Download, Map } from "lucide-react";
 
 interface CardParametersProps {
   title: string;
@@ -31,9 +31,6 @@ const CardParameter = (props: CardParametersProps) => {
           >
             <Eye className="my-1 mx-2" />
           </button>
-          <button className="bg-[#e3e1dc98] hover:bg-[#94949469] rounded-md">
-            <Waypoints className="my-1 mx-2" />
-          </button>
           <button
             className={`rounded-md ${
               isActive
@@ -43,6 +40,9 @@ const CardParameter = (props: CardParametersProps) => {
             onClick={handleEyeclick}
           >
             <Map className="my-1 mx-2" />
+          </button>
+          <button className="bg-[#e3e1dc98] hover:bg-[#94949469] rounded-md">
+            <Download className="my-1 mx-2" />
           </button>
         </div>
       </div>

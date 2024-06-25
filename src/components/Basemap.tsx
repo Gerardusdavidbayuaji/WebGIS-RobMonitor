@@ -87,19 +87,19 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 let color = "blue";
                 switch (feature.properties.tipe) {
                   case "Industri/Gedung":
-                    color = "#86469C";
+                    color = "#4245f5";
                     break;
                   case "Pemukiman":
                     color = "#FF5B22";
                     break;
                   case "Perdagangan/Jasa":
-                    color = "#FB9AD1";
+                    color = "#9c7a1f";
                     break;
                   case "Tempat Ibadah":
-                    color = "#FFCDEA";
+                    color = "#a31107";
                     break;
                   case "Kantor Pemeintahan":
-                    color = "#99BC85";
+                    color = "#095c1f";
                     break;
                   default:
                     color = "blue";
