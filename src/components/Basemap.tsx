@@ -124,7 +124,7 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
             break;
           case "Titik Validasi":
             const validationIcon = L.icon({
-              iconUrl: "/public/assets/validation-icon-1.png",
+              iconUrl: "/assets/validation-icon-1.png",
               iconSize: [32, 32],
               iconAnchor: [16, 32],
             });
