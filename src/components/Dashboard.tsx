@@ -12,20 +12,35 @@ import CardBaseMap from "@/components/CardBaseMap";
 import Basemap from "@/components/Basemap";
 import Sidebar from "@/components/Sidebar";
 
+interface Feature {
+  properties: {
+    layer: string;
+  };
+}
+
+interface DataLayers {
+  [key: string]: Feature[] | null;
+}
+
 const Dashboard = () => {
   const [activeParams, setActiveParams] = useState<string[]>([]);
-  const [dataLayers, setDataLayers] = useState<any>({
+  const [dataLayers, setDataLayers] = useState<DataLayers>({
     "Bahaya Rob Rendah": null,
     "Bahaya Rob Sedang": null,
     "Bahaya Rob Tinggi": null,
+    "Persil Bangunan": null,
+    Sungai: null,
+    "Titik Validasi": null,
+    "Garis Pantai": null,
+    "Batas Kecamatan": null,
   });
-  const [zoomToData, setZoomToData] = useState<any>(null);
+  const [zoomToData, setZoomToData] = useState<Feature[] | null>(null);
   const [lastParam, setLastParam] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async (param: string) => {
       try {
-        let result;
+        let result: Feature[] | null = null;
 
         switch (param) {
           case "Bahaya Rob Rendah":
@@ -33,9 +48,8 @@ const Dashboard = () => {
           case "Bahaya Rob Tinggi":
             const genanganRobData = await getGenanganRob();
             result = genanganRobData.features.filter(
-              (feature: any) => feature.properties.layer === param
+              (feature: Feature) => feature.properties.layer === param
             );
-
             break;
           case "Persil Bangunan":
             result = await getPersilBangunan();
@@ -52,13 +66,10 @@ const Dashboard = () => {
           case "Batas Kecamatan":
             result = await getBatasKecamatan();
             break;
-          default:
-            result = null;
-            break;
         }
 
         if (result) {
-          setDataLayers((prevLayers: any) => ({
+          setDataLayers((prevLayers) => ({
             ...prevLayers,
             [param]: result,
           }));
