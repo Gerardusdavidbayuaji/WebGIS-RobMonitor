@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
 import { HiOutlineGlobe } from "react-icons/hi";
-import { FiSearch } from "react-icons/fi";
 import { Layers } from "lucide-react";
 
 import {
@@ -29,16 +28,6 @@ const CardBaseMap = () => {
       </div>
 
       <div className="flex gap-4">
-        <div className="bg-[#292929] border border-[#94949469] w-[185px] rounded-md p-2 ">
-          <div className="flex gap-4 items-center">
-            <FiSearch className="h-5 w-5" color="#94949469" />
-            <input
-              type="search"
-              placeholder="Search Data Layers"
-              className="bg-transparent outline-none text-[#94949469] text-sm w-full placeholder:text-sm placeholder:italic"
-            />
-          </div>
-        </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="p-2 bg-[#292929] border border-[#94949469] rounded-md">

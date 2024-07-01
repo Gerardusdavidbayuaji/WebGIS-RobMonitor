@@ -10,11 +10,11 @@ import {
 import CardParameter from "@/components/CardParameter";
 import CardBaseMap from "@/components/CardBaseMap";
 import Basemap from "@/components/Basemap";
-import Sidebar from "@/components/Sidebar";
 
 interface Feature {
   properties: {
     layer: string;
+    [key: string]: any;
   };
 }
 
@@ -29,10 +29,10 @@ const Dashboard = () => {
     "Bahaya Rob Sedang": null,
     "Bahaya Rob Tinggi": null,
     "Persil Bangunan": null,
-    Sungai: null,
     "Titik Validasi": null,
     "Garis Pantai": null,
     "Batas Kecamatan": null,
+    Sungai: null,
   });
   const [zoomToData, setZoomToData] = useState<Feature[] | null>(null);
   const [lastParam, setLastParam] = useState<string | null>(null);
@@ -128,7 +128,7 @@ const Dashboard = () => {
         </div>
       </div>
       <CardBaseMap />
-      <Sidebar activateParam={lastParam} />
+      {/* <Sidebar activateParam={lastParam} /> Remove Sidebar component */}
     </div>
   );
 };

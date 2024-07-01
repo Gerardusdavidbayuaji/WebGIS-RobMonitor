@@ -43,6 +43,15 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 fillOpacity: 0.8,
                 stroke: false,
               }),
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
+                <strong>Status:</strong> ${feature.properties.layer}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Bahaya Rob Sedang":
@@ -52,6 +61,15 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 fillOpacity: 0.8,
                 stroke: false,
               }),
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
+                <strong>Status:</strong> ${feature.properties.layer}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Bahaya Rob Tinggi":
@@ -61,6 +79,15 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 fillOpacity: 0.8,
                 stroke: false,
               }),
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
+                <strong>Status:</strong> ${feature.properties.layer}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Batas Kecamatan":
@@ -70,6 +97,14 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 weight: 1,
                 opacity: 1,
               },
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Kecamatan:</strong> ${feature.properties.WADMKC} <br/>
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Garis Pantai":
@@ -78,6 +113,14 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 color: "#9DB2BF",
                 weight: 1,
                 opacity: 1,
+              },
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Panjang (m):</strong> ${feature.properties.Panjang_m2}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
               },
             }).addTo(mapRef.current);
             break;
@@ -98,7 +141,7 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                   case "Tempat Ibadah":
                     color = "#a31107";
                     break;
-                  case "Kantor Pemeintahan":
+                  case "Kantor Pemerintahan":
                     color = "#095c1f";
                     break;
                   default:
@@ -111,6 +154,15 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                   opacity: 1,
                 };
               },
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Jenis Bangunan:</strong> ${feature.properties.tipe} </br>
+                <strong>Tinggi Bangunan (m):</strong> ${feature.properties.tinggi}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Sungai":
@@ -120,24 +172,45 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
                 fillOpacity: 1,
                 stroke: false,
               },
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Jenis Bangunan:</strong> ${feature.properties.NAMOBJ}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           case "Titik Validasi":
             const validationIcon = L.icon({
-              iconUrl: "/assets/validation-icon-1.png",
+              iconUrl: "/assets/banjir.svg",
               iconSize: [32, 32],
-              iconAnchor: [16, 32],
+              iconAnchor: [12, 25],
+              popupAnchor: [0, -25],
             });
             layerRefs.current[key] = L.geoJSON(dataLayers[key], {
               pointToLayer: (_feature: any, latlng: L.LatLngExpression) => {
                 return L.marker(latlng, { icon: validationIcon });
               },
+              onEachFeature: (feature, layer) => {
+                const popupContent = `
+              <div>
+                <strong>Latitude:</strong> ${feature.properties.Latitude} </br>
+                <strong>Longitude:</strong> ${feature.properties.Longitude} </br>
+                <strong>Tinggi Genangan (m):</strong> ${feature.properties.Tinggi_Rob}
+              </div>
+            `;
+                layer.bindPopup(popupContent);
+              },
             }).addTo(mapRef.current);
             break;
           default:
-            layerRefs.current[key] = L.geoJSON(dataLayers[key]).addTo(
-              mapRef.current
-            );
+            layerRefs.current[key] = L.geoJSON(dataLayers[key], {
+              onEachFeature: (feature, layer) => {
+                layer.bindPopup(`Layer: ${feature.properties.layer}`);
+              },
+            }).addTo(mapRef.current);
             break;
         }
       }
