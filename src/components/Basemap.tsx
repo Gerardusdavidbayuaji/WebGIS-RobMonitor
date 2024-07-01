@@ -175,7 +175,7 @@ const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Jenis Bangunan:</strong> ${feature.properties.NAMOBJ}
+                <strong>Sungai:</strong> ${feature.properties.NAMOBJ}
               </div>
             `;
                 layer.bindPopup(popupContent);
