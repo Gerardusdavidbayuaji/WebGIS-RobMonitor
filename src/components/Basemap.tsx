@@ -7,7 +7,8 @@ interface BasemapProps {
   zoomToData: any;
 }
 
-const Basemap = ({ dataLayers, zoomToData }: BasemapProps) => {
+const Basemap = (props: BasemapProps) => {
+  const { dataLayers, zoomToData } = props;
   const mapRef = useRef<L.Map | null>(null);
   const layerRefs = useRef<any>({});
 
