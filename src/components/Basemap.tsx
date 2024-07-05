@@ -47,8 +47,8 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
-                <strong>Status:</strong> ${feature.properties.layer}
+                <p class="text-base text-[#292929]">Luas (ha): <span>${feature.properties.Luas_m2}</span></p>
+                <p class="text-base text-[#292929]">Status: <span>${feature.properties.layer}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -65,8 +65,8 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
-                <strong>Status:</strong> ${feature.properties.layer}
+                <p class="text-base text-[#292929]">Luas (ha): <span>${feature.properties.Luas_m2}</span></p>
+                <p class="text-base text-[#292929]">Status: <span>${feature.properties.layer}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -83,8 +83,8 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Luas (Ha):</strong> ${feature.properties.Luas_m2} <br/>
-                <strong>Status:</strong> ${feature.properties.layer}
+                <p class="text-base text-[#292929]">Luas (ha): <span>${feature.properties.Luas_m2}</span></p>
+                <p class="text-base text-[#292929]">Status: <span>${feature.properties.layer}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -101,7 +101,7 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Kecamatan:</strong> ${feature.properties.WADMKC} <br/>
+                <p class="text-base text-[#292929]">Kecamatan: <span>${feature.properties.WADMKC}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -118,7 +118,7 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Panjang (m):</strong> ${feature.properties.Panjang_m2}
+                <p class="text-base text-[#292929]">Panjang Pantai: <span>${feature.properties.Panjang_m2}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -158,8 +158,8 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Jenis Bangunan:</strong> ${feature.properties.tipe} </br>
-                <strong>Tinggi Bangunan (m):</strong> ${feature.properties.tinggi}
+                <p class="text-base text-[#292929]">Luas (ha): <span>${feature.properties.tipe}</span></p>
+                <p class="text-base text-[#292929]">Tinggi Bangunan: <span>${feature.properties.tinggi} meter</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -176,7 +176,7 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Sungai:</strong> ${feature.properties.NAMOBJ}
+                <p class="text-base text-[#292929]">Luas (ha): <span>${feature.properties.NAMOBJ}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);
@@ -197,9 +197,8 @@ const Basemap = (props: BasemapProps) => {
               onEachFeature: (feature, layer) => {
                 const popupContent = `
               <div>
-                <strong>Latitude:</strong> ${feature.properties.Latitude} </br>
-                <strong>Longitude:</strong> ${feature.properties.Longitude} </br>
-                <strong>Tinggi Genangan (m):</strong> ${feature.properties.Tinggi_Rob}
+                <p class="text-base text-[#292929]">Latitude: <span>${feature.properties.Latitude}</span></p>
+                <p class="text-base text-[#292929]">Longitude: <span>${feature.properties.Longitude}</span></p>
               </div>
             `;
                 layer.bindPopup(popupContent);

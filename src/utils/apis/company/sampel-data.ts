@@ -10,23 +10,25 @@ export const listMap = [
   {
     id: 1,
     title: "satellite",
-    cover_image: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    cover_image:
+      "https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=AW8IuG306IIk8kNdxEw6",
   },
   {
     id: 2,
     title: "street",
-    cover_image: "https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+    cover_image:
+      "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key=AW8IuG306IIk8kNdxEw6",
   },
   {
     id: 3,
     title: "light",
     cover_image:
-      "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
   },
   {
     id: 4,
     title: "dark",
     cover_image:
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
   },
 ];
